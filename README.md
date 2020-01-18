@@ -1,44 +1,31 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Kiosk
+##### *** This is a work-in-progress ***
 
-## Available Scripts
+### `Architecture`
+<img src="kiosk.png" alt="Kitten"
+	title="Kiosk Architecture"/>
 
-In the project directory, you can run:
+### `Purpose`
 
-### `yarn start`
+This is a WIP social web app to share current media consumption among friends. Of the 4 media categories, Films and TV Series will retrieve data from [OMDB](https://www.omdbapi.com/), Games from [IGDB](https://www.igdb.com/discover) and Books from [GoodReads](https://www.goodreads.com/).
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+React in TS is used client-side, with a Cloud Function acting as a proxy server for API
+calls and DB action triggers. Firestore is used for Authentication and as a Database.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Authetication in the client is managed using the React Context API. React-Select is used to search for and persist data from the APIs.  All lifecycle events are handled using React Hooks. Styling is achieved with a mix of Styled-Components and Material UI.
 
-### `yarn test`
+Using a Cloud Function as a gateway allows us to bypass CORS issues and listen for DB changes with hooks provided by Firebase such as `authOnCreate` or `authOnDelete`. It also provides a layer to handle some of the authentication logic.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Firestore expedites development by providing tooling for the database layer and deep integration with client-side JavaScript frameworks.
 
-### `yarn build`
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### `To Do`
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+1. Implement feed to view friends' activity.
+2. Implement shareable link for unauthenticated activity sharing.
+3. Add Types where missing.
+4. Set up prod credentials/api keys. 
+5. UI/UX work.
+6. Local development walkthrough.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Created using [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), and [Google Firebase](https://firebase.google.com/).
