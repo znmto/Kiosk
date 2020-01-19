@@ -16,7 +16,6 @@ import axios from "axios";
 import debounce from "lodash/debounce";
 import { useSession } from "../Helpers/CustomHooks";
 import firebase from '../FirebaseConfig';
-
 import { FIREBASE_GET_USER_URL } from "../Constants/api";
 
 const useStyles = makeStyles(theme => ({
@@ -36,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.secondary.main
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1)
   },
   submit: {
@@ -68,29 +67,8 @@ const Friends: React.FC = props => {
     setFriendEmail(trimmed);
   };
 
-  // const getFriends = async () => {
-  //   try {
-  //     const { data, status } = await axios({
-  //       url: FIREBASE_GET_FRIENDS_URL,
-  //       method: "GET",
-  //       headers: {
-  //         "Content-type": "application/json"
-  //       },
-  //       params: {
-  //         uid: user.uid,
-  //       }
-  //     });
-  //     console.log("data", data);
-  //     setFriendsArr(data);
-  //   } catch (error) {
-  //     console.log('error', error);
-  //     console.error(error.message);
-  //   }
-  // }
-
   const handleAddFriend = async e => {
     e.preventDefault();
-    console.log("e", e);
     try {
       const { data, status } = await axios({
         method: 'GET',
@@ -103,27 +81,24 @@ const Friends: React.FC = props => {
         },
 
       });
-      console.log('data, status', data, status);
+      console.log('handleAddFriend data, status', data, status);
       const newState = friendsArr.concat(data);
 
       const fields = await firebase.firestore().collection('users').doc(user.uid);
-      console.log('collection before', fields);
+      console.log('fields before', fields);
       console.log('friendsArr before', friendsArr);
       await fields.update({
         friends: newState, 
       });
       console.log('friendsArr after', newState);
-
       return setFriendsArr(newState);
-
     } catch (error) {
       console.log('error', error);
     }
   };
 
 useEffect(() => {
-  // getFriends();
-  console.log('mount state', friendsArr);
+  console.log('friends mount state', friendsArr);
   const listener = firebase.firestore().collection('users').doc(user.uid).onSnapshot((doc) => {
     const source = doc.metadata.hasPendingWrites;
     const friends = doc.data() ? doc.data()!.friends : [];
@@ -152,7 +127,6 @@ useEffect(() => {
             autoFocus
             value={friendEmail}
             onChange={e => setFriend(e.target.value)}
-            // onChange={e => debounce(setFriend(e.target.value), 500)}
           />
           <div className={classes.authError}>
             <h3>{authError}</h3>

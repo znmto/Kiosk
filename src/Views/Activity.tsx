@@ -50,7 +50,6 @@ const media = [
         icon: <MdLiveTv />,
         quadrant: [2,1],
         iconStyles: 'top: 47%; left: 51.5%',
-        // TODO: put into env file
         url: `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}`,
         method: 'GET',
         headers: {

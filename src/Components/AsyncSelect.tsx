@@ -17,6 +17,7 @@ import { Typography } from '@material-ui/core';
 import { FaTrashAlt } from 'react-icons/fa';
 
 interface StyleProps {
+  // x,y location of section in view
   quadrant?: number[];
   primary?: string;
   iconStyles?: string;
@@ -131,7 +132,7 @@ const AsyncSelectWrapper = props => {
   const reducer = (state, payload) => ({ ...state, ...payload });
 
   const theme = useTheme();
-  const user: any = useSession();
+  const user: any = useSession(); // TODO: fix type
 
   const firestore = firebase.firestore();
   const [state, dispatch] = useReducer(reducer, { selected: {}});
@@ -140,21 +141,19 @@ const AsyncSelectWrapper = props => {
   const handleOnChange = async selectedOption => {
     console.log('onChange selectedOption', selectedOption);
     console.log('user', user);
-    // set in firebase
+    // get user data from DB
     const fields = await firestore.collection('users').doc(user.uid);
     console.log('collection before', fields);
     console.log('state before', state);
+    // update field in DB
     const res = await fields.update({
       [firestoreKey]: selectedOption, 
     });
     console.log('onChange db response', res);
     console.log('collection after', fields);
-    // dispatch({ selectedOption });
-
   };
 
   const handleOnFocus = _ => console.log('onFocus');
-
   
   const handleLoadOptions = (inputValue: string, callback) => {
     console.log('inputValue', inputValue)
@@ -164,8 +163,9 @@ const AsyncSelectWrapper = props => {
   
   const callCloudFn = async (maybeInput: string, callback) => {
     try {
+      // add parameters to API url if necessary
       const parametrizedUrl = searchParam ? apiUrl.concat(`&${searchParam}=${maybeInput}`) : apiUrl;
-      console.log('paramet', parametrizedUrl);
+      console.log('parametrizedUrl', parametrizedUrl);
       const { data: response, status } = await axios({
         url: FIREBASE_PROXY_URL,
         method: 'POST',
@@ -173,13 +173,17 @@ const AsyncSelectWrapper = props => {
           'Content-type': 'application/json',
         },
         data: {
+          // api URL
           url: parametrizedUrl,
+          // POST body
           body: data,
+          // http verb
           method,
           headers,
         },
       })
       console.log('response.Search', response.Search);
+      // use custom schema parsing function to manipulate API response data
       return callback(schemaParser(response));
     } catch (error) {
       console.log('error', error);
@@ -188,7 +192,6 @@ const AsyncSelectWrapper = props => {
 
   const getImage = () => {
     const { selected: { value : { image = '' } = {} } = {} } = state;
-    console.log('get image state', state);
     if (!isEmpty(state.selected)) return <img src={image} />;
     return <></>;
   }
@@ -211,22 +214,24 @@ const AsyncSelectWrapper = props => {
  
   const handleClear = async () => {
     const fields = await firestore.collection('users').doc(user.uid);
-    console.log('state before', state);
+    console.log('handleClear state before', state);
+    // remove entry from DB
     await fields.update({
       [firestoreKey]: {}, 
     });
-    console.log('state after', state);
+    console.log('handleClear state after', state);
   };
 
     useEffect(() => {
       console.log('mount state', state);
         const listener = firebase.firestore().collection('users').doc(user.uid).onSnapshot((doc) => {
           const source = doc.metadata.hasPendingWrites;
-          const selected = doc.data() && doc.data()![firestoreKey];
+          const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
           console.log('source', source);
           console.log('doc.data', doc.data())
           return dispatch({ selected })
         });
+        // unsubscribe listener
         return () => listener();
     }, []);
   

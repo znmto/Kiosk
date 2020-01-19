@@ -14,12 +14,10 @@ const App: React.FC = () => {
   const { initializing, user }: { initializing: boolean, user: UserCredential } = useAuth();
   // const fields: any = useSnapshot(user);
   if (initializing) {
-    console.log('process.env', process.env);
     return <div>Loading</div>
   }
   return (
     <UserContext.Provider value={{ user }}>
-    {/* <FirestoreContext.Provider value={fields}> */}
          <Router>
             <Layout>
               <Route path={SIGNUP} exact component={SignupOrLogin} />
@@ -30,7 +28,6 @@ const App: React.FC = () => {
               {/* <Route path={PROFILE} exact component={Profile} /> */}
           </Layout>
          </Router>
-      {/* </FirestoreContext.Provider> */}
       </UserContext.Provider>
   );
 }

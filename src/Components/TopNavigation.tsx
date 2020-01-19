@@ -2,20 +2,16 @@ import React from "react";
 import IconButton from "@material-ui/core/IconButton";
 import { AccountCircle, ExitToApp } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
-import { SupervisorAccount, Home, Favorite } from "@material-ui/icons";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { HOME, ACTIVITY, FRIENDS } from "../Constants/routes";
+import { HOME, ACTIVITY } from "../Constants/routes";
 import { LOGIN } from "../Constants/routes";
 import firebase from "../FirebaseConfig";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { useSession } from "../Helpers/CustomHooks";
 import { useTheme } from '@material-ui/core/styles';
 interface StyleProps {
   secondary?: string;
 }
-
-const firebaseAuth = firebase.auth();
 
 const StyledAccountButtonWrapper = styled.div`
   position: relative;

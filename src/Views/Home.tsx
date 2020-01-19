@@ -25,7 +25,7 @@ const Home: React.FC = props => {
   const getFeedData = async (friends: string[]) => {
       try {
         console.log('friends before getUserByEmail', friends);
-        const { data, status } = await axios({
+        const { data } = await axios({
           url: FIREBASE_GET_USER_URL,
           method: 'GET',
           headers: {
@@ -36,13 +36,9 @@ const Home: React.FC = props => {
           },
         });
         console.log('data', data);
-        console.log('status', status);
         return data;
-
-
-
       } catch (error) {
-        console.log('get friend emails error', error.message);
+        console.log('error', error);
       }
   }
 

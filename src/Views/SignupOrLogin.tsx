@@ -73,7 +73,6 @@ const SignupOrLogin = props => {
       const userDocRef: DocumentReference = firebase.firestore().collection('users').doc(user.uid);
       const unsubscribe = userDocRef.onSnapshot({
           next: snapshot => {
-              // showProgressMessage('User document created')
               unsubscribe()
           },
           error: error => {

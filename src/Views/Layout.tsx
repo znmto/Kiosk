@@ -8,11 +8,6 @@ import {
   ThemeProvider,
 } from '@material-ui/core/styles';
 
-import purple from '@material-ui/core/colors/purple';
-import green from '@material-ui/core/colors/green';
-
-
-
 const StyledLayoutWrapper = styled.div`
     margin-top: 100px;
     margin-bottom: 55px;
@@ -21,7 +16,6 @@ const StyledLayoutWrapper = styled.div`
 const StyledRootWrapper = styled.div`
   overflow-y: scroll;
 `;
-
 
 // https://paletton.com/#uid=3360u0kcvfm7JpEaLkAhQcem+9S
 const theme = createMuiTheme({
@@ -40,8 +34,8 @@ const theme = createMuiTheme({
     fontFamily: "'Roboto', sans-serif",
   }
 } as any);
-const Layout: React.FC = ({ children }) => {
 
+const Layout: React.FC = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <StyledRootWrapper>
