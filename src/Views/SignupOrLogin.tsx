@@ -66,7 +66,6 @@ const SignupOrLogin = props => {
   
   const handleSignup = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    console.log('handleSignup')
     try {
       const { user }: { user: UserCredential } =  await firebaseAuth.createUserWithEmailAndPassword(email, password);
       // Wait until document is created by Cloud Functions code
@@ -83,7 +82,6 @@ const SignupOrLogin = props => {
       });
         // redirect to home
         history.push(HOME);
-      console.log('user', user);
     } catch (error) {
       setAuthError(error.message);
       console.error(error);
@@ -93,7 +91,6 @@ const SignupOrLogin = props => {
   
   const handleLogin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    console.log('handleLogin')
     try {
       const res =  await firebaseAuth.signInWithEmailAndPassword(email, password);
       const { additionalUserInfo,
@@ -102,7 +99,6 @@ const SignupOrLogin = props => {
         user, } = res;
         // redirect to home if successful
       res.user && history.push(HOME);
-      console.log('res', res)    
     } catch (error) {
       setAuthError(error.message);
       console.error(error);
@@ -112,8 +108,8 @@ const SignupOrLogin = props => {
   
 
 
-  useEffect(() => console.log('labelsMap', labelsMap['title']), []);
-  useEffect(() => console.log('email / pass change', email, password), [email, password]);
+  // useEffect(() => console.log('labelsMap', labelsMap['title']), []);
+  // useEffect(() => console.log('email / pass change', email, password), [email, password]);
 
   return (
     <Suspense fallback={<h1>LOADING</h1>} >

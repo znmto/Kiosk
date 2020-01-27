@@ -27,9 +27,7 @@ app.get('/getUserByEmail', (req, res) => {
     const { email } = req.query;
     admin.auth().getUserByEmail(email)
         .then(({ uid }) => {
-            console.log('successfully fetched user data:', uid);
             const response = { email, uid }
-            console.log('response to client', response);
             return res
                 .contentType('application/json')
                 .status(200)
@@ -39,7 +37,6 @@ app.get('/getUserByEmail', (req, res) => {
 });
 
 app.post('/addFriend', cors({ origin: true, methods: 'POST, OPTIONS'}), (req, res) => {
-    console.log('/addFriend req.query.email', req.query.email);
     const { email, currentUserUid } = req.body;
     const user = { email };
     const getUser = admin.auth().getUserByEmail(user.email);
@@ -47,9 +44,7 @@ app.post('/addFriend', cors({ origin: true, methods: 'POST, OPTIONS'}), (req, re
         .then(({ uid }) => user.uid = uid)
         .then(async _ => {
             const fields = await admin.firestore.collection('users').doc(currentUserUid);
-            console.log('/addFriend fields', fields);
             const existingFriends = fields.friends;
-            console.log('/addFriend existingFriends', existingFriends);
             const updatedFriends = existingFriends.concat(user);
             await fields.update({
                 friends: updatedFriends

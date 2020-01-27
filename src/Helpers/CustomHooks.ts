@@ -16,7 +16,6 @@ export const useAuth = () => {
         return { initializing: !user, user, } 
     });
     const onChange = user => {
-        console.log('useAuth onChange user', user)
         setState({ initializing: false, user });
     };
 

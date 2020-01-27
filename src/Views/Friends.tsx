@@ -62,7 +62,6 @@ const Friends: React.FC = props => {
   const user: any = useSession();
 
   const setFriend = e => {
-    console.log("e", e);
     const trimmed = e.trim();
     setFriendEmail(trimmed);
   };
@@ -81,16 +80,12 @@ const Friends: React.FC = props => {
         },
 
       });
-      console.log('handleAddFriend data, status', data, status);
       const newState = friendsArr.concat(data);
 
       const fields = await firebase.firestore().collection('users').doc(user.uid);
-      console.log('fields before', fields);
-      console.log('friendsArr before', friendsArr);
       await fields.update({
         friends: newState, 
       });
-      console.log('friendsArr after', newState);
       return setFriendsArr(newState);
     } catch (error) {
       console.log('error', error);
@@ -98,12 +93,9 @@ const Friends: React.FC = props => {
   };
 
 useEffect(() => {
-  console.log('friends mount state', friendsArr);
   const listener = firebase.firestore().collection('users').doc(user.uid).onSnapshot((doc) => {
     const source = doc.metadata.hasPendingWrites;
     const friends = doc.data() ? doc.data()!.friends : [];
-    console.log('source', source);
-    console.log('doc.data', doc.data())
     return setFriendsArr(friends)
   });
   return () => listener();

@@ -24,7 +24,6 @@ const Home: React.FC = props => {
 
   const getFeedData = async (friends: string[]) => {
       try {
-        console.log('friends before getUserByEmail', friends);
         const { data } = await axios({
           url: FIREBASE_GET_USER_URL,
           method: 'GET',
@@ -35,7 +34,6 @@ const Home: React.FC = props => {
             ids: friends,
           },
         });
-        console.log('data', data);
         return data;
       } catch (error) {
         console.log('error', error);
@@ -46,28 +44,16 @@ const Home: React.FC = props => {
 
   useEffect(() => {
       const listener = firebase.firestore().collection('users').doc(user.uid).onSnapshot((doc) => {
-        console.log('doc', doc);
         const source = doc.metadata.hasPendingWrites;
         const friends = doc.data() && doc.data()!.friends;
-        console.log('source', source);
-        console.log('doc.data', doc.data())
         return setFriendsArr(friends);
       });
       return () => listener();
   }, []);
 
 
-  // useEffect(() => {
-  //   console.log('friends useeffect');
-  // }, [state.friends])
   return (
     <div></div>
-    // <div>
-    //   {state.friends.map(f => 
-    //   <h2 key={f}>{f}</h2>
-    //     )}
-      // <button role="button" onClick={() => getFeedData(friendsArr[0].friends)}>get</button>
-    // </div>
   )
 }
 

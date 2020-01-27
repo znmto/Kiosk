@@ -139,24 +139,17 @@ const AsyncSelectWrapper = props => {
 
   
   const handleOnChange = async selectedOption => {
-    console.log('onChange selectedOption', selectedOption);
-    console.log('user', user);
     // get user data from DB
     const fields = await firestore.collection('users').doc(user.uid);
-    console.log('collection before', fields);
-    console.log('state before', state);
     // update field in DB
     const res = await fields.update({
       [firestoreKey]: selectedOption, 
     });
-    console.log('onChange db response', res);
-    console.log('collection after', fields);
   };
 
   const handleOnFocus = _ => console.log('onFocus');
   
   const handleLoadOptions = (inputValue: string, callback) => {
-    console.log('inputValue', inputValue)
     if(!inputValue) return callback([]);
     return callCloudFn(inputValue, callback);
   };
@@ -165,7 +158,6 @@ const AsyncSelectWrapper = props => {
     try {
       // add parameters to API url if necessary
       const parametrizedUrl = searchParam ? apiUrl.concat(`&${searchParam}=${maybeInput}`) : apiUrl;
-      console.log('parametrizedUrl', parametrizedUrl);
       const { data: response, status } = await axios({
         url: FIREBASE_PROXY_URL,
         method: 'POST',
@@ -182,7 +174,6 @@ const AsyncSelectWrapper = props => {
           headers,
         },
       })
-      console.log('response.Search', response.Search);
       // use custom schema parsing function to manipulate API response data
       return callback(schemaParser(response));
     } catch (error) {
@@ -214,21 +205,16 @@ const AsyncSelectWrapper = props => {
  
   const handleClear = async () => {
     const fields = await firestore.collection('users').doc(user.uid);
-    console.log('handleClear state before', state);
     // remove entry from DB
     await fields.update({
       [firestoreKey]: {}, 
     });
-    console.log('handleClear state after', state);
   };
 
     useEffect(() => {
-      console.log('mount state', state);
         const listener = firebase.firestore().collection('users').doc(user.uid).onSnapshot((doc) => {
           const source = doc.metadata.hasPendingWrites;
           const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
-          console.log('source', source);
-          console.log('doc.data', doc.data())
           return dispatch({ selected })
         });
         // unsubscribe listener
