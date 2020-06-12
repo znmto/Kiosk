@@ -16,6 +16,7 @@ const App: React.FC = () => {
   if (initializing) {
     return <div>Loading</div>
   }
+  console.log(process.env)
   return (
     <UserContext.Provider value={{ user }}>
          <Router>

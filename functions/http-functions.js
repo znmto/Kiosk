@@ -5,23 +5,24 @@ const axios = require("axios");
 require("tls").DEFAULT_ECDH_CURVE = "auto";
 
 exports.cors = functions.https.onRequest((req, res) => {
+  console.log("req", req.body);
   cors(req, res, () => {
     const {
-      body: { url, body, method, headers }
+      body: { url, body: data, method, headers },
     } = req;
-    try {
-      axios({
-        url,
-        method,
-        headers: {
-          "Content-type": "application/json",
-          ...headers
-        },
-        body
+    axios({
+      url,
+      method,
+      headers: {
+        "Content-type": "application/json",
+        ...headers,
+      },
+      data,
+    })
+      .then(({ status, data }) => {
+        console.log("status", status);
+        status === 200 && res.status(200).send(data);
       })
-        .then(({ status, data }) => status === 200 && res.status(200).send(data));
-    } catch (error) {
-      console.error(error);
-    }
+      .catch((error) => console.log("error", error.response));
   });
 });
