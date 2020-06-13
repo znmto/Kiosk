@@ -1,6 +1,6 @@
 import "isomorphic-fetch";
 import axios from "axios";
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, memo } from "react";
 import TextField from "@material-ui/core/TextField";
 import AsyncSelect from "react-select/async";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -128,7 +128,7 @@ const selectStyles = {
   singleValue: (styles, { data }) => ({ ...styles }),
 };
 
-const AsyncSelectWrapper = (props) => {
+const AsyncSelectWrapper: React.FC = memo((props: any) => {
   const {
     label,
     url: apiUrl,
@@ -142,6 +142,7 @@ const AsyncSelectWrapper = (props) => {
     quadrant = [],
     externalUrl = "",
     iconStyles = "",
+    additionalRequest = {},
   } = props;
   const reducer = (state, payload) => ({ ...state, ...payload });
 
@@ -152,11 +153,23 @@ const AsyncSelectWrapper = (props) => {
   const [state, dispatch] = useReducer(reducer, { selected: {} });
 
   const handleOnChange = async (selectedOption) => {
+    const optionCopy = Object.assign({}, selectedOption);
+    // if we need to make a 2nd call to augment the user selection, do it on change
+    if (!isEmpty(additionalRequest)) {
+      const additionalResponse = await augmentWithAdditionalRequest(
+        optionCopy.value[additionalRequest?.matchFieldName]
+      );
+      console.log("additionalResponse", additionalResponse);
+      const imageUrl = `https:${additionalResponse[0].url}`;
+      console.log("imageUrl", imageUrl);
+      optionCopy.value.image = imageUrl;
+    }
+    console.log("optionCopy", optionCopy);
     // get user data from DB
     const fields = await firestore.collection("users").doc(user.uid);
     // update field in DB
     const res = await fields.update({
-      [firestoreKey]: selectedOption,
+      [firestoreKey]: optionCopy,
     });
   };
 
@@ -165,6 +178,32 @@ const AsyncSelectWrapper = (props) => {
   const handleLoadOptions = (inputValue: string, callback) => {
     if (!inputValue) return callback([]);
     return callCloudFn(inputValue, callback);
+  };
+
+  const augmentWithAdditionalRequest = async (matchFieldName) => {
+    const { url, data, method, headers, description } = props.additionalRequest;
+    window.console.log(`additional request initated to ${description}`);
+    try {
+      const { data: response } = await axios({
+        url: FIREBASE_PROXY_URL,
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        data: {
+          url,
+          body: `where id = ${matchFieldName}; fields *;`,
+          // body: data,
+          method,
+          headers,
+        },
+      });
+      console.log("additional response", response);
+      return response;
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   const callCloudFn = async (maybeInput: string, callback) => {
@@ -191,6 +230,7 @@ const AsyncSelectWrapper = (props) => {
           headers,
         },
       });
+
       // use custom schema parsing function to manipulate API response data
       console.log("response", response);
       return callback(schemaParser(response));
@@ -287,6 +327,6 @@ const AsyncSelectWrapper = (props) => {
       )}
     </StyledMediaSelectorWrapper>
   );
-};
+});
 
 export default AsyncSelectWrapper;

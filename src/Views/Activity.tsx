@@ -103,6 +103,17 @@ const media = [
     schemaParser: igdbSchemaParser,
     firestoreKey: "game",
     data: 'search "war"; fields *;',
+    additionalRequest: {
+      description: "fetch cover art",
+      matchFieldName: "cover",
+      url: "https://api-v3.igdb.com/covers",
+      data: 'where id = "44920"; fields *;',
+      method: "POST",
+      headers: {
+        "user-key": process.env.REACT_APP_IGDB_USER_KEY,
+        Accept: "application/json",
+      },
+    },
   },
 ];
 

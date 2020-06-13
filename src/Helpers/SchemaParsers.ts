@@ -51,12 +51,13 @@ export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
 
 export const igdbSchemaParser = (apiResponse: IGDBGameArr) => {
   console.log("apiResponse", apiResponse);
-  return apiResponse.map(({ id, name: title, first_release_date }) => ({
+  return apiResponse.map(({ id, name: title, first_release_date, cover }) => ({
     label: `${title}`,
     value: {
       id,
       title,
       subtitle: new Date(first_release_date ?? 0 * 1000).getFullYear(),
+      cover,
       type: "game",
     },
   }));
