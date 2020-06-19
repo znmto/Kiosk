@@ -1,5 +1,6 @@
-import React from "react";
-import { useTheme } from "@material-ui/core/styles";
+import React, { memo, useState, useEffect } from "react";
+import axios from "axios";
+import { useTheme, Theme } from "@material-ui/core/styles";
 import styled from "styled-components";
 import AsyncSelect from "../Components/AsyncSelect";
 import {
@@ -13,13 +14,25 @@ import {
   MdVideogameAsset,
   MdChromeReaderMode,
 } from "react-icons/md";
-import { Input } from "@material-ui/core";
+import { useSession } from "../Helpers/CustomHooks";
+import { FIREBASE_GET_ID_URL } from "../Constants/api";
+import { User } from "firebase";
+import ClipBoardCopy from "../Components/CopyToClipboard";
 
-interface StyleProps {
+type StyleProps = {
   color?: string;
-}
+};
+
+type PublicUser = {
+  email: string;
+  uid: string;
+};
 
 const StyledMediaSelectionWrapper = styled.div`
+  display: grid;
+  justify-content: space-evenly;
+`;
+const StyledPublicUserInfo = styled.h2`
   display: grid;
   justify-content: center;
 `;
@@ -38,7 +51,13 @@ const StyledCenteredDivider = styled.div`
 `;
 
 const StyledShareableLinkContainer = styled.div`
-  margin: 0 auto;
+  display: grid;
+  justify-content: center;
+  padding: 20px 0;
+  & input {
+    width: 300px;
+    padding: 5px;
+  }
 `;
 
 const media = [
@@ -46,7 +65,6 @@ const media = [
     label: "Movie",
     icon: <MdLocalMovies />,
     quadrant: [1, 1],
-    iconStyles: "top: 47%; left: 46%; font-size: 32px",
     url: "http://www.omdbapi.com/?apikey=3b953286",
     method: "GET",
     headers: {
@@ -61,7 +79,6 @@ const media = [
     label: "TV Show",
     icon: <MdLiveTv />,
     quadrant: [2, 1],
-    iconStyles: "top: 47%; left: 51.5%",
     url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}`,
     method: "GET",
     headers: {
@@ -76,7 +93,6 @@ const media = [
     label: "Book",
     icon: <MdChromeReaderMode />,
     quadrant: [1, 2],
-    iconStyles: "top: 53%; left: 46%",
     url: `https://www.googleapis.com/books/v1/volumes?key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}&projection=lite`,
     method: "GET",
     headers: {
@@ -91,7 +107,6 @@ const media = [
     label: "Game",
     icon: <MdVideogameAsset />,
     quadrant: [2, 2],
-    iconStyles: "top: 53%; left: 51.5%; font-size: 32px",
     url: "https://api-v3.igdb.com/games",
     method: "POST",
     headers: {
@@ -102,7 +117,7 @@ const media = [
     // prefixForDataString: "search ''"
     schemaParser: igdbSchemaParser,
     firestoreKey: "game",
-    data: 'search "war"; fields *;',
+    data: 'search "world of warcraft"; fields *;',
     additionalRequest: {
       description: "fetch cover art",
       matchFieldName: "cover",
@@ -117,23 +132,55 @@ const media = [
   },
 ];
 
-const Activity: React.FC = (props) => {
-  const theme = useTheme();
-  console.log("{process.env", process.env);
-  console.log("{process.env", process.env);
+interface ActivityProps {
+  match?: any;
+}
+
+const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
+  const { match: { params = {} } = {} } = props;
+  const [publicUser, setPublicUser] = useState<PublicUser>();
+  const theme: Theme = useTheme();
+  const user: User = useSession();
+
+  const getUserNamesById = async (userIdArr: string[]) => {
+    console.log("userIdArr", userIdArr);
+    const userIdParam = userIdArr.join(",");
+    try {
+      const { data } = await axios({
+        url: FIREBASE_GET_ID_URL,
+        method: "GET",
+        params: {
+          ids: userIdParam,
+        },
+      });
+      console.log("data", data);
+      const publicUser: PublicUser = data[0];
+      return setPublicUser(publicUser);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  useEffect(() => {
+    !user && getUserNamesById([params?.uid]);
+  }, []);
+  console.log("window.location", window.location);
   return (
     <>
-      <StyledShareableLinkContainer>
-        <Input readOnly value="test" />
-      </StyledShareableLinkContainer>
+      {user ? (
+        <StyledShareableLinkContainer>
+          <ClipBoardCopy />
+        </StyledShareableLinkContainer>
+      ) : (
+        <StyledPublicUserInfo>{`${publicUser?.email}'s List`}</StyledPublicUserInfo>
+      )}
       <StyledMediaSelectionWrapper>
         {/* <StyledCenteredDivider color={theme.palette.primary.main}><FaTimes/></StyledCenteredDivider> */}
         {media.map((m) => (
-          <AsyncSelect key={m.label} {...m} />
+          <AsyncSelect publicUserId={params?.uid} key={m.label} {...m} />
         ))}
       </StyledMediaSelectionWrapper>
     </>
   );
-};
+});
 
 export default Activity;

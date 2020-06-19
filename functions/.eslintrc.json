@@ -1,0 +1,11 @@
+{
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {},
+  "globals": {
+    "window": true
+  },
+  "env": {
+    "browser": true
+  }
+}

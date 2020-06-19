@@ -1,30 +1,31 @@
 ## Kiosk
-##### *** This is a work-in-progress ***
+
+##### **_ This is a work-in-progress _**
 
 ### `Architecture`
+
 <img src="kiosk.png" alt="Kitten"
 	title="Kiosk Architecture"/>
 
 ### `Purpose`
 
-This is a WIP social web app to share current media consumption among friends. Of the 4 media categories, Films and TV Series will retrieve data from [OMDB](https://www.omdbapi.com/), Games from [IGDB](https://www.igdb.com/discover) and Books from [GoodReads](https://www.goodreads.com/).
+This is a WIP social web app to share current media consumption among friends. Of the 4 media categories, Films and TV Series will retrieve data from [OMDB](https://www.omdbapi.com/), Games from [IGDB](https://www.igdb.com/discover) and Books from [Google Books](https://developers.google.com/books).
 
 React in TS is used client-side, with a Cloud Function acting as a proxy server for API
 calls and DB action triggers. Firestore is used for Authentication and as a Database.
 
-Authetication in the client is managed using the React Context API. React-Select is used to search for and persist data from the APIs.  All lifecycle events are handled using React Hooks. Styling is achieved with a mix of Styled-Components and Material UI.
+Authentication in the client is managed using the React Context API. React-Select is used to search for and persist data from the APIs. All lifecycle events are handled using React Hooks. Styling is achieved with a mix of Styled-Components and Material UI.
 
 Using a Cloud Function as a gateway allows us to bypass CORS issues and listen for DB changes with hooks provided by Firebase such as `authOnCreate` or `authOnDelete`. It also provides a layer to handle some of the authentication logic.
 
 Firestore expedites development by providing tooling for the database layer and deep integration with client-side JavaScript frameworks.
-
 
 ### `To Do`
 
 1. Implement feed to view friends' activity.
 2. Implement shareable link for unauthenticated activity sharing.
 3. Add Types where missing.
-4. Set up prod credentials/api keys. 
+4. Set up prod credentials/api keys.
 5. UI/UX work.
 6. Local development walkthrough.
 

@@ -8,7 +8,7 @@ import { HOME, ACTIVITY } from "../Constants/routes";
 import { LOGIN } from "../Constants/routes";
 import firebase from "../FirebaseConfig";
 import { useSession } from "../Helpers/CustomHooks";
-import { useTheme } from '@material-ui/core/styles';
+import { useTheme } from "@material-ui/core/styles";
 interface StyleProps {
   secondary?: string;
 }
@@ -72,11 +72,11 @@ const StyledTitle = styled(Typography)`
   grid-row: 2;
   margin: 0;
   color: #325247;
-  font-family: 'Hind Vadodara', sans-serif !important;
+  font-family: "Hind Vadodara", sans-serif !important;
   cursor: pointer;
 `;
 
-const TopNav: React.FC = props => {
+const TopNav: React.FC = (props) => {
   const history = useHistory();
   const user: any = useSession();
   const theme = useTheme();
@@ -95,25 +95,35 @@ const TopNav: React.FC = props => {
   };
   return (
     <StyledTopNavigation>
-      <div className="logoWrapper"  onClick={_ => history.push(HOME)}>
-        <img src="./logo.png" />
+      <div className="logoWrapper" onClick={(_) => history.push(HOME)}>
+        <img alt="Kiosk Logo" src="./logo.png" />
       </div>
-      <StyledTitle variant="h1" onClick={_ => history.push(HOME)}>Kiosk</StyledTitle>
-      <StyledAccountButtonWrapper onClick={handleProfileClick} secondary={theme.palette.secondary.main}>
+      <StyledTitle variant="h1" onClick={(_) => history.push(HOME)}>
+        Kiosk
+      </StyledTitle>
+      <StyledAccountButtonWrapper
+        onClick={handleProfileClick}
+        secondary={theme.palette.secondary.main}
+      >
         <IconButton aria-label="account">
           <AccountCircle />
         </IconButton>
       </StyledAccountButtonWrapper>
       {user && (
-        <StyledLogoutButtonWrapper onClick={handleLogout} secondary={theme.palette.secondary.main}>
+        <StyledLogoutButtonWrapper
+          onClick={handleLogout}
+          secondary={theme.palette.secondary.main}
+        >
           <IconButton aria-label="logout">
             <ExitToApp />
           </IconButton>
         </StyledLogoutButtonWrapper>
       )}
-      {user && <StyledLoggedInUserHeader>
-        Logged in as {user.email}
-      </StyledLoggedInUserHeader>}
+      {user && (
+        <StyledLoggedInUserHeader>
+          Logged in as {user.email}
+        </StyledLoggedInUserHeader>
+      )}
     </StyledTopNavigation>
   );
 };

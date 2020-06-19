@@ -20,9 +20,17 @@ exports.cors = functions.https.onRequest((req, res) => {
       data,
     })
       .then(({ status, data }) => {
+        console.log("data", data);
         console.log("status", status);
         status === 200 && res.status(200).send(data);
       })
-      .catch((error) => console.log("error", error.response));
+      .catch((error) =>
+        console.log(
+          "error",
+          error.response.status,
+          error.response.statusText,
+          error.response.data
+        )
+      );
   });
 });

@@ -5,4 +5,5 @@ export const HOME: string = "/home";
 export const PROFILE: string = "/profile";
 export const FRIENDS: string = "/friends";
 export const ACTIVITY: string = "/activity";
+export const PUBLIC_ACTIVITY: string = "/activity/:uid";
 export const PASSWORD_FORGET: string = "/password_forget";

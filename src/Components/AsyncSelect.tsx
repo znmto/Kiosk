@@ -16,26 +16,24 @@ import { useSession } from "../Helpers/CustomHooks";
 import { Typography } from "@material-ui/core";
 import { FaTrashAlt } from "react-icons/fa";
 
-interface StyleProps {
+type StyleProps = {
   // x,y location of section in view
   quadrant?: number[];
   primary?: string;
-  iconStyles?: string;
   danger?: string;
   colors?: any;
-}
+};
 
 const StyledMediaSelectorWrapper = styled.div`
   display: grid;
-  width: 250px;
   margin: 0 auto;
   grid-column: ${({ quadrant = [] }: StyleProps) => quadrant[0]};
   grid-row: ${({ quadrant = [] }: StyleProps) => quadrant[1]};
   height: calc((100vh - 350px) / 2);
-  align-content: end;
-  padding: 25px 150px;
+  align-content: center;
+  justify-content: center;
   img {
-    width: 250px;
+    max-width: 250px;
     margin: 0 auto;
   }
   ${({ quadrant = [], primary }: StyleProps) =>
@@ -45,7 +43,7 @@ const StyledMediaSelectorWrapper = styled.div`
       &::after {
       content: "";
       border: 1px solid ${primary};
-      position: relative;
+      position: absolute;
       top: 25px;
       left: 300px;
       align-self: center;
@@ -59,7 +57,7 @@ const StyledMediaSelectorWrapper = styled.div`
       &::before {
       content: "";
       border: 1px solid ${primary};
-      position: relative;
+      position: absolute;
       top: 170px;
       right: 152px;
       align-self: center;
@@ -70,11 +68,26 @@ const StyledMediaSelectorWrapper = styled.div`
 ` as any;
 
 const StyledIconWrapper = styled.div`
-  font-size: 28px;
+  font-size: 32px;
   color: ${(props: StyleProps) => props.primary};
   text-align: center;
   position: absolute;
-  ${({ iconStyles = "" }: StyleProps) => iconStyles};
+  ${({ quadrant = [] }: StyleProps) => {
+    switch (quadrant.join()) {
+      case "1,1": {
+        return `left: 45%; top: 47%`;
+      }
+      case "1,2": {
+        return `right: 45%;  top: 50%`;
+      }
+      case "2,1": {
+        return `right: 45%; bottom: 46%`;
+      }
+      case "2,2": {
+        return `left: 45%; bottom: 50%`;
+      }
+    }
+  }};
 ` as any;
 
 const StyledLoader = styled(Loader)`
@@ -128,7 +141,7 @@ const selectStyles = {
   singleValue: (styles, { data }) => ({ ...styles }),
 };
 
-const AsyncSelectWrapper: React.FC = memo((props: any) => {
+const AsyncSelectWrapper: React.FC<any> = memo((props: any) => {
   const {
     label,
     url: apiUrl,
@@ -143,6 +156,7 @@ const AsyncSelectWrapper: React.FC = memo((props: any) => {
     externalUrl = "",
     iconStyles = "",
     additionalRequest = {},
+    publicUserId,
   } = props;
   const reducer = (state, payload) => ({ ...state, ...payload });
 
@@ -274,25 +288,40 @@ const AsyncSelectWrapper: React.FC = memo((props: any) => {
   };
 
   useEffect(() => {
-    const listener = firebase
-      .firestore()
-      .collection("users")
-      .doc(user.uid)
-      .onSnapshot((doc) => {
-        const source = doc.metadata.hasPendingWrites;
-        const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
-        return dispatch({ selected });
-      });
-    // unsubscribe listener
-    return () => listener();
-  }, []);
+    console.log("user?.uid", user?.uid);
+    if (user?.uid) {
+      const listener = firebase
+        .firestore()
+        .collection("users")
+        .doc(user?.uid)
+        .onSnapshot((doc) => {
+          const source = doc.metadata.hasPendingWrites;
+          const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
+          return dispatch({ selected });
+        });
+      // unsubscribe listener
+      return () => listener();
+    }
+    if (publicUserId) {
+      console.log("publicUserId", publicUserId);
+      const publicActivityData = firebase
+        .firestore()
+        .collection("users")
+        .doc(publicUserId)
+        .get()
+        .then((doc) => {
+          const selected = doc.data() && doc.data()![firestoreKey];
+          return dispatch({ selected });
+        });
+    }
+  }, [firestoreKey, user, publicUserId]);
 
   return (
     <StyledMediaSelectorWrapper
       quadrant={quadrant}
       primary={theme.palette.primary.main}
     >
-      {!isEmpty(state.selected) && (
+      {!isEmpty(state.selected) && !publicUserId && (
         <StyledTrashIconContainer
           danger={theme.palette.error.main}
           onClick={handleClear}
@@ -303,13 +332,7 @@ const AsyncSelectWrapper: React.FC = memo((props: any) => {
       {/* <h3>{label}</h3> */}
       {getImage()}
       {getDecription()}
-      <StyledIconWrapper
-        primary={theme.palette.primary.main}
-        iconStyles={iconStyles}
-        alt={label}
-      >
-        {icon}
-      </StyledIconWrapper>
+
       {isEmpty(state.selected) && (
         <AsyncSelect
           value={state.selected}
@@ -325,6 +348,13 @@ const AsyncSelectWrapper: React.FC = memo((props: any) => {
           // styles={selectStyles}
         />
       )}
+      <StyledIconWrapper
+        primary={theme.palette.primary.main}
+        quadrant={quadrant}
+        alt={label}
+      >
+        {icon}
+      </StyledIconWrapper>
     </StyledMediaSelectorWrapper>
   );
 });

@@ -1,16 +1,16 @@
-import React from 'react';
-import BottomNavigation from '../Components/BottomNavigation';
-import TopNavigation from '../Components/TopNavigation';
-import styled from 'styled-components';
+import React from "react";
+import BottomNavigation from "../Components/BottomNavigation";
+import TopNavigation from "../Components/TopNavigation";
+import styled from "styled-components";
 import {
   createMuiTheme,
   Theme as AugmentedTheme,
   ThemeProvider,
-} from '@material-ui/core/styles';
+} from "@material-ui/core/styles";
 
 const StyledLayoutWrapper = styled.div`
-    margin-top: 100px;
-    margin-bottom: 55px;
+  margin-top: 100px;
+  margin-bottom: 55px;
 `;
 
 const StyledRootWrapper = styled.div`
@@ -21,18 +21,18 @@ const StyledRootWrapper = styled.div`
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#325247'
+      main: "#325247",
     },
     secondary: {
-       main: '#677685'
-  },
-  error: {
-    main: '#966370',
-  },
+      main: "#677685",
+    },
+    error: {
+      main: "#966370",
+    },
   },
   typography: {
     fontFamily: "'Roboto', sans-serif",
-  }
+  },
 } as any);
 
 const Layout: React.FC = ({ children }) => {
@@ -41,13 +41,12 @@ const Layout: React.FC = ({ children }) => {
       <StyledRootWrapper>
         <TopNavigation />
         <StyledLayoutWrapper>
-              <div>{children}</div>
-          </StyledLayoutWrapper>
+          <div>{children}</div>
+        </StyledLayoutWrapper>
         <BottomNavigation />
       </StyledRootWrapper>
     </ThemeProvider>
   );
-}
+};
 
 export default Layout;
-
