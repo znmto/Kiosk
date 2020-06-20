@@ -14,7 +14,8 @@ import { useTheme } from "@material-ui/core/styles";
 import firebase from "../FirebaseConfig";
 import { useSession } from "../Helpers/CustomHooks";
 import { Typography } from "@material-ui/core";
-import { FaTrashAlt } from "react-icons/fa";
+import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
+import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
 type StyleProps = {
   // x,y location of section in view
@@ -26,7 +27,6 @@ type StyleProps = {
 
 const StyledMediaSelectorWrapper = styled.div`
   display: grid;
-  margin: 0 auto;
   grid-column: ${({ quadrant = [] }: StyleProps) => quadrant[0]};
   grid-row: ${({ quadrant = [] }: StyleProps) => quadrant[1]};
   height: calc((100vh - 350px) / 2);
@@ -36,57 +36,26 @@ const StyledMediaSelectorWrapper = styled.div`
     max-width: 250px;
     margin: 0 auto;
   }
-  ${({ quadrant = [], primary }: StyleProps) =>
-    quadrant[0] === 1 &&
-    quadrant[1] === 1 &&
-    `
-      &::after {
-      content: "";
-      border: 1px solid ${primary};
-      position: absolute;
-      top: 25px;
-      left: 300px;
-      align-self: center;
-      width: 200px;
-      }
-      `};
-  ${({ quadrant = [], primary }: StyleProps) =>
-    quadrant[0] === 2 &&
-    quadrant[1] === 1 &&
-    `
-      &::before {
-      content: "";
-      border: 1px solid ${primary};
-      position: absolute;
-      top: 170px;
-      right: 152px;
-      align-self: center;
-      width: 0px;
-      height: 200px;
-      }
-      `};
-` as any;
+`;
 
 const StyledIconWrapper = styled.div`
-  font-size: 32px;
+  font-size: 36px;
   color: ${(props: StyleProps) => props.primary};
-  text-align: center;
+  display: grid;
   position: absolute;
-  ${({ quadrant = [] }: StyleProps) => {
-    switch (quadrant.join()) {
-      case "1,1": {
-        return `left: 45%; top: 47%`;
-      }
-      case "1,2": {
-        return `right: 45%;  top: 50%`;
-      }
-      case "2,1": {
-        return `right: 45%; bottom: 46%`;
-      }
-      case "2,2": {
-        return `left: 45%; bottom: 50%`;
-      }
-    }
+  ${({ quadrant = [] }: StyleProps): string => {
+    const borderCommon = `1px solid #eee`;
+    const quadStyleMap = {
+      "1,1": `justify-self: end;
+        align-self: end; border-bottom: ${borderCommon}; border-right: ${borderCommon}; padding: 120px 60px 60px 120px`,
+      "1,2": `justify-self: end;
+        align-self: start; border-top: ${borderCommon}; border-right: ${borderCommon}; padding: 60px 60px 120px 120px`,
+      "2,1": `justify-self: start;
+        align-self: end; border-bottom: ${borderCommon}; border-left: ${borderCommon}; padding: 120px 120px 60px 60px`,
+      "2,2": `justify-self: start;
+        align-self: start; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 60px 120px 120px 60px`,
+    };
+    return quadStyleMap[quadrant.join()];
   }};
 ` as any;
 
@@ -94,16 +63,35 @@ const StyledLoader = styled(Loader)`
   margin: 0 auto;
   display: inline-block;
 `;
+const StyledAsyncSelectWrapper = styled.div`
+  width: 300px;
+`;
 const StyledDescriptionContainer = styled.div`
   text-align: center;
+  margin-top: 15px;
   & a {
     text-decoration: none;
     color: unset;
   }
 `;
 
+const StyledActionIconsContainer = styled.div`
+  display: grid;
+  justify-content: space-between;
+`;
+
 const StyledTrashIconContainer = styled.div`
   color: ${({ danger = "" }: StyleProps) => danger};
+  grid-row: 1;
+  cursor: pointer;
+  font-size: 24px;
+`;
+
+const StyledExternalLinkIconContainer = styled.div`
+  & > a {
+    color: ${({ primary = "" }: StyleProps) => primary};
+  }
+  grid-row: 1;
   cursor: pointer;
   font-size: 24px;
 `;
@@ -148,13 +136,13 @@ const AsyncSelectWrapper: React.FC<any> = memo((props: any) => {
     headers,
     method,
     data,
+    dataFormatter,
     searchParam,
     schemaParser,
     icon,
     firestoreKey = "",
     quadrant = [],
-    externalUrl = "",
-    iconStyles = "",
+    externalUrlFormatter,
     additionalRequest = {},
     publicUserId,
   } = props;
@@ -223,6 +211,8 @@ const AsyncSelectWrapper: React.FC<any> = memo((props: any) => {
   const callCloudFn = async (maybeInput: string, callback) => {
     try {
       console.log("maybeInput", maybeInput);
+      // custom format data if necessary
+      const postData = dataFormatter ? dataFormatter(maybeInput) : data;
       // add parameters to API url if necessary
       const parametrizedUrl = searchParam
         ? apiUrl.concat(`&${searchParam}=${maybeInput}`)
@@ -235,12 +225,9 @@ const AsyncSelectWrapper: React.FC<any> = memo((props: any) => {
           "Access-Control-Allow-Origin": "*",
         },
         data: {
-          // api URL
-          url: parametrizedUrl,
-          // POST body
-          body: data,
-          // http verb
-          method,
+          url: parametrizedUrl, // api URL
+          body: postData, // POST body
+          method, // http verb
           headers,
         },
       });
@@ -267,7 +254,14 @@ const AsyncSelectWrapper: React.FC<any> = memo((props: any) => {
       return (
         <StyledDescriptionContainer>
           <Typography component="h1" variant="h4">
-            <a href={`${externalUrl}${id}`} rel="noopener noreferrer">
+            {/* TODO: change this to open recommendations */}
+            <a
+              href={
+                // `${externalUrl}${id}`
+                externalUrlFormatter(state.selected)
+              }
+              rel="noopener noreferrer"
+            >
               {title}
             </a>
           </Typography>
@@ -322,31 +316,42 @@ const AsyncSelectWrapper: React.FC<any> = memo((props: any) => {
       primary={theme.palette.primary.main}
     >
       {!isEmpty(state.selected) && !publicUserId && (
-        <StyledTrashIconContainer
-          danger={theme.palette.error.main}
-          onClick={handleClear}
-        >
-          <FaTrashAlt />
-        </StyledTrashIconContainer>
+        <StyledActionIconsContainer>
+          <StyledTrashIconContainer
+            danger={theme.palette.error.main}
+            onClick={handleClear}
+          >
+            <HighlightOffOutlinedIcon />
+          </StyledTrashIconContainer>
+          <StyledExternalLinkIconContainer primary={theme.palette.primary.main}>
+            <a
+              href={externalUrlFormatter(state.selected)}
+              rel="noopener noreferrer"
+            >
+              <OpenInNewIcon />
+            </a>
+          </StyledExternalLinkIconContainer>
+        </StyledActionIconsContainer>
       )}
       {/* <h3>{label}</h3> */}
       {getImage()}
       {getDecription()}
-
       {isEmpty(state.selected) && (
-        <AsyncSelect
-          value={state.selected}
-          cacheOptions
-          loadOptions={debounce(handleLoadOptions, 1000)}
-          defaultOptions={[]}
-          placeholder="Start typing to search..."
-          onChange={handleOnChange}
-          // isClearable
-          loadingMessage={() => <StyledLoader />}
-          noOptionsMessage={() => "No search results"}
-          onFocus={handleOnFocus}
-          // styles={selectStyles}
-        />
+        <StyledAsyncSelectWrapper>
+          <AsyncSelect
+            value={state.selected}
+            cacheOptions
+            loadOptions={debounce(handleLoadOptions, 1000)}
+            defaultOptions={[]}
+            placeholder="Start typing to search..."
+            onChange={handleOnChange}
+            // isClearable
+            loadingMessage={() => <StyledLoader />}
+            noOptionsMessage={() => "No search results"}
+            onFocus={handleOnFocus}
+            // styles={selectStyles}
+          />
+        </StyledAsyncSelectWrapper>
       )}
       <StyledIconWrapper
         primary={theme.palette.primary.main}

@@ -84,6 +84,7 @@ interface VolumeInfo {
   previewLink: string;
   infoLink: string;
   canonicalVolumeLink: string;
+  industryIdentifiers: any;
 }
 
 interface ImageLinks {

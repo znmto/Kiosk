@@ -51,6 +51,7 @@ const ClipBoardCopy = memo(() => {
           endAdornment: (
             <InputAdornment position="end">
               <Tooltip
+                // open
                 open={state.copied}
                 title={"Copied to clipboard!"}
                 leaveDelay={1500}

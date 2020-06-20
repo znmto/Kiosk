@@ -19,7 +19,7 @@ const StyledAccountButtonWrapper = styled.div`
   grid-row: 2;
   grid-column: 3;
   & button {
-    padding: 0;
+    padding: 15px;
     color: ${(props: StyleProps) => props.secondary};
   }
   justify-self: end;
@@ -30,7 +30,7 @@ const StyledLogoutButtonWrapper = styled.div`
   grid-column: 3;
   justify-self: end;
   & button {
-    padding: 0;
+    padding: 15px;
     color: ${(props: StyleProps) => props.secondary};
   }
 `;
@@ -98,7 +98,7 @@ const TopNav: React.FC = (props) => {
       <div className="logoWrapper" onClick={(_) => history.push(HOME)}>
         <img alt="Kiosk Logo" src="./logo.png" />
       </div>
-      <StyledTitle variant="h1" onClick={(_) => history.push(HOME)}>
+      <StyledTitle variant="h2" onClick={(_) => history.push(HOME)}>
         Kiosk
       </StyledTitle>
       <StyledAccountButtonWrapper

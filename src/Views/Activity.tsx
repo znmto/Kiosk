@@ -30,6 +30,7 @@ type PublicUser = {
 
 const StyledMediaSelectionWrapper = styled.div`
   display: grid;
+  grid-template-columns: 1fr 1fr;
   justify-content: space-evenly;
 `;
 const StyledPublicUserInfo = styled.h2`
@@ -53,7 +54,7 @@ const StyledCenteredDivider = styled.div`
 const StyledShareableLinkContainer = styled.div`
   display: grid;
   justify-content: center;
-  padding: 20px 0;
+  padding: 40px 0 20px;
   & input {
     width: 300px;
     padding: 5px;
@@ -73,7 +74,8 @@ const media = [
     searchParam: "s",
     schemaParser: omdbSchemaParser,
     firestoreKey: "movie",
-    externalUrl: "https://imdb.com/title/",
+    externalUrlFormatter: (interpolatable): string =>
+      `https://imdb.com/title/${interpolatable?.value?.id}`,
   },
   {
     label: "TV Show",
@@ -87,13 +89,14 @@ const media = [
     searchParam: "s",
     schemaParser: omdbSchemaParser,
     firestoreKey: "tvShow",
-    externalUrl: "https://imdb.com/title/",
+    externalUrlFormatter: (interpolatable): string =>
+      `https://imdb.com/title/${interpolatable?.value?.id}`,
   },
   {
     label: "Book",
     icon: <MdChromeReaderMode />,
     quadrant: [1, 2],
-    url: `https://www.googleapis.com/books/v1/volumes?key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}&projection=lite`,
+    url: `https://www.googleapis.com/books/v1/volumes?key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}&projection=full`,
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -101,7 +104,12 @@ const media = [
     searchParam: "q",
     schemaParser: googleBooksSchemaParser,
     firestoreKey: "book",
-    externalUrl: "",
+    externalUrlFormatter: (interpolatable): string => {
+      const isbn = interpolatable?.value?.isbn13;
+      // AMAZON REFERRAL
+      const refCode = "";
+      return `https://amazon.com/s?k=${isbn}&ref=${refCode}`;
+    },
   },
   {
     label: "Game",
@@ -113,22 +121,25 @@ const media = [
       "user-key": process.env.REACT_APP_IGDB_USER_KEY,
       Accept: "application/json",
     },
-    // searchParam: "name",
-    // prefixForDataString: "search ''"
     schemaParser: igdbSchemaParser,
     firestoreKey: "game",
-    data: 'search "world of warcraft"; fields *;',
+    dataFormatter: (interpolatable: string): string => {
+      const prefix: string = "search ";
+      const postfix: string = " fields *;";
+      return `${prefix}"${interpolatable}";${postfix}`;
+    },
     additionalRequest: {
       description: "fetch cover art",
       matchFieldName: "cover",
       url: "https://api-v3.igdb.com/covers",
-      data: 'where id = "44920"; fields *;',
       method: "POST",
       headers: {
         "user-key": process.env.REACT_APP_IGDB_USER_KEY,
         Accept: "application/json",
       },
     },
+    externalUrlFormatter: (interpolatable): string =>
+      `https://imdb.com/title/${interpolatable?.value?.url}`,
   },
 ];
 
