@@ -24,7 +24,12 @@ yarn-error.log*
 
 # user defined
 /functions/node_modules
+/functions/service_account_key.json
 .env
 .env.development
 google-application-credentials.json
 /src/FirebaseConfig.ts
+*.log
+/**/*.log
+/.firebase
+/.vscode
