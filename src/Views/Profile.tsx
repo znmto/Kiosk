@@ -6,9 +6,9 @@ const Profile: React.FC = () => {
     <div>
       <h1>profile</h1>
       <div className="selection-wrapper">
-        {["foo", "bar"].map((m) => (
+        {/* {["foo", "bar"].map((m) => (
           <AsyncSelect key={m} />
-        ))}
+        ))} */}
       </div>
     </div>
   );

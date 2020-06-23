@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { SupervisorAccount, Home, Favorite } from "@material-ui/icons";
 import styled, { StyledProps } from "styled-components";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { HOME, ACTIVITY, FRIENDS } from "../Constants/routes";
 import { useTheme } from "@material-ui/core/styles";
 import { BottomNavigationProps } from "@material-ui/core/BottomNavigation";
@@ -23,40 +23,43 @@ const StyledBottomNavigation = styled(BottomNavigation)`
   height: 55px;
 ` as any;
 
-const BottomNav: React.FC = (_) => {
-  // default view
-  const [route, setRoute] = React.useState("activity");
-
+const BottomNav: React.FC = (props) => {
+  let location = useLocation();
   let history = useHistory();
+  // default view
+  const [route, setRoute] = React.useState(location?.pathname);
+
+  console.log("location", location);
   const theme = useTheme();
 
-  const handleChange = (event: React.ChangeEvent<{}>, newRoute: string): void =>
-    setRoute(newRoute);
-
   const navigate = (route: string): void => history.push(route);
+
+  useEffect(() => {
+    setRoute(location?.pathname);
+  }, [location]);
 
   return (
     <StyledBottomNavigation
       value={route}
-      onChange={handleChange}
+      showLabels
       secondary={theme.palette.secondary.main}
     >
       <BottomNavigationAction
         onClick={(e) => navigate(HOME)}
         label="Home"
-        value="home"
+        value="/home"
         icon={<Home />}
       />
       <BottomNavigationAction
         onClick={(e) => navigate(ACTIVITY)}
         label="My Activity"
-        value="activity"
+        value="/activity"
         icon={<Favorite />}
       />
       <BottomNavigationAction
         onClick={(e) => navigate(FRIENDS)}
         label="Friends"
-        value="friends"
+        value="/friends"
         icon={<SupervisorAccount />}
       />
     </StyledBottomNavigation>

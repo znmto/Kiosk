@@ -139,7 +139,7 @@ const media = [
       },
     },
     externalUrlFormatter: (interpolatable): string =>
-      `https://imdb.com/title/${interpolatable?.value?.url}`,
+      interpolatable?.value?.url,
   },
 ];
 

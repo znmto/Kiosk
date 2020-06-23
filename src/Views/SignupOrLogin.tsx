@@ -9,9 +9,12 @@ import {
   Checkbox,
   Link,
   Grid,
-  Box,
+  Card,
+  CardMedia,
   Typography,
   makeStyles,
+  CardHeader,
+  CardContent,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Container from "@material-ui/core/Container";
@@ -19,6 +22,12 @@ import firebase from "../FirebaseConfig";
 import { SIGNUP, LOGIN, HOME } from "../Constants/routes";
 import { UserCredential } from "firebase/firebase-auth";
 import { DocumentReference } from "firebase/firebase-app";
+import List from "@material-ui/core/List";
+import ListItem, { ListItemProps } from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import LockOpenIcon from "@material-ui/icons/LockOpen";
+import styled from "styled-components";
 
 const useStyles = makeStyles((theme) => ({
   "@global": {
@@ -51,6 +60,10 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+
+const StyledSampleLoginsCard = styled(Card)`
+  margin: 50px 0;
+`;
 
 const SignupOrLogin = (props) => {
   const firebaseAuth = firebase.auth();
@@ -134,9 +147,42 @@ const SignupOrLogin = (props) => {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
+          <StyledSampleLoginsCard variant="outlined">
+            <CardContent>
+              <Typography variant="h5" align="center">
+                Sample Logins
+              </Typography>
+              <Typography variant="body2" align="center">
+                (click to prefill form)
+              </Typography>
+              <List component="nav" aria-label="main mailbox folders">
+                <ListItem
+                  button
+                  onClick={() => {
+                    setEmail("test1@test.com");
+                    setPassword("test123");
+                  }}
+                >
+                  <ListItemIcon>
+                    <LockOpenIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="test1@test.com / test123" />
+                </ListItem>
+                <ListItem
+                  button
+                  onClick={() => {
+                    setEmail("test1@test.com");
+                    setPassword("test123");
+                  }}
+                >
+                  <ListItemIcon>
+                    <LockOpenIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="test1@test.com / test123" />
+                </ListItem>
+              </List>
+            </CardContent>
+          </StyledSampleLoginsCard>
           <Typography component="h1" variant="h5">
             {labelsMap["title"]}
           </Typography>

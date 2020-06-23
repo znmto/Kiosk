@@ -11,6 +11,7 @@ import { useSession } from "../Helpers/CustomHooks";
 import { useTheme } from "@material-ui/core/styles";
 interface StyleProps {
   secondary?: string;
+  primary?: string;
 }
 
 const StyledAccountButtonWrapper = styled.div`
@@ -41,6 +42,7 @@ const StyledLoggedInUserHeader = styled(Typography)`
   grid-column: 3;
   justify-self: end;
   margin: 0;
+  color: ${(props: StyleProps) => props.primary};
 `;
 const StyledTopNavigation = styled.div`
   width: 100%;
@@ -120,8 +122,8 @@ const TopNav: React.FC = (props) => {
         </StyledLogoutButtonWrapper>
       )}
       {user && (
-        <StyledLoggedInUserHeader>
-          Logged in as {user.email}
+        <StyledLoggedInUserHeader primary={theme.palette.primary.main}>
+          {user.email}
         </StyledLoggedInUserHeader>
       )}
     </StyledTopNavigation>

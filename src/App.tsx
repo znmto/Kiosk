@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import SignupOrLogin from "./Views/SignupOrLogin";
 import Profile from "./Views/Profile";
 import Home from "./Views/Home";
@@ -30,6 +30,9 @@ const App: React.FC = () => {
     <UserContext.Provider value={{ user }}>
       <Router>
         <Layout>
+          <Route exact path="/">
+            <Redirect to={ACTIVITY} />
+          </Route>
           <Route path={SIGNUP} exact component={SignupOrLogin} />
           <Route path={LOGIN} exact component={SignupOrLogin} />
           <Route path={ACTIVITY} exact component={Activity} />
