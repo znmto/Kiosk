@@ -9,6 +9,8 @@ import { LOGIN } from "../Constants/routes";
 import firebase from "../FirebaseConfig";
 import { useSession } from "../Helpers/CustomHooks";
 import { useTheme } from "@material-ui/core/styles";
+import logo from "../logo.png";
+
 interface StyleProps {
   secondary?: string;
   primary?: string;
@@ -98,7 +100,7 @@ const TopNav: React.FC = (props) => {
   return (
     <StyledTopNavigation>
       <div className="logoWrapper" onClick={(_) => history.push(HOME)}>
-        <img alt="Kiosk Logo" src="./logo.png" />
+        <img alt="Kiosk Logo" src={logo} />
       </div>
       <StyledTitle variant="h2" onClick={(_) => history.push(HOME)}>
         Kiosk

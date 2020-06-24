@@ -6,7 +6,7 @@ require("tls").DEFAULT_ECDH_CURVE = "auto";
 
 exports.cors = functions.https.onRequest((req, res) => {
   console.log("req", req.body);
-  cors(req, res, () => {
+  return cors(req, res, () => {
     const {
       body: { url, body: data, method, headers },
     } = req;
@@ -22,15 +22,8 @@ exports.cors = functions.https.onRequest((req, res) => {
       .then(({ status, data }) => {
         console.log("data", data);
         console.log("status", status);
-        status === 200 && res.status(200).send(data);
+        if (status === 200) res.status(200).send(data);
       })
-      .catch((error) =>
-        console.log(
-          "error",
-          error.response.status,
-          error.response.statusText,
-          error.response.data
-        )
-      );
+      .catch(error => console.log("error", error.response.status, error.response.statusText, error.response.data));
   });
 });

@@ -96,7 +96,7 @@ const media = [
     label: "Book",
     icon: <MdChromeReaderMode />,
     quadrant: [1, 2],
-    url: `https://www.googleapis.com/books/v1/volumes?key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}&projection=full`,
+    url: `https://www.googleapis.com/books/v1/volumes?key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}&projection=full&country=US`,
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -168,7 +168,7 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
       const publicUser: PublicUser = data[0];
       return setPublicUser(publicUser);
     } catch (error) {
-      console.log("error", error);
+      console.log("error", error.response);
     }
   };
   useEffect(() => {

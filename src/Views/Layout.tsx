@@ -29,6 +29,9 @@ const theme = createMuiTheme({
     error: {
       main: "#966370",
     },
+    success: {
+      main: "#69f0ae",
+    },
   },
   typography: {
     fontFamily: "'Roboto', sans-serif",

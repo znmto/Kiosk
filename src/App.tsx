@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from "react-router-dom";
 import SignupOrLogin from "./Views/SignupOrLogin";
 import Profile from "./Views/Profile";
 import Home from "./Views/Home";
@@ -16,6 +21,7 @@ import {
 } from "./Constants/routes";
 import { useAuth, UserContext, FirestoreContext } from "./Helpers/CustomHooks";
 import { UserCredential } from "firebase/firebase-auth";
+import { CircularProgress, Grid } from "@material-ui/core";
 
 const App: React.FC = () => {
   const {
@@ -24,22 +30,26 @@ const App: React.FC = () => {
   }: { initializing: boolean; user: UserCredential } = useAuth();
   // const fields: any = useSnapshot(user);
   if (initializing) {
-    return <div>Loading</div>;
+    return (
+      <Grid container justify="center">
+        <CircularProgress />
+      </Grid>
+    );
   }
   return (
     <UserContext.Provider value={{ user }}>
       <Router>
         <Layout>
-          <Route exact path="/">
-            <Redirect to={ACTIVITY} />
-          </Route>
-          <Route path={SIGNUP} exact component={SignupOrLogin} />
-          <Route path={LOGIN} exact component={SignupOrLogin} />
-          <Route path={ACTIVITY} exact component={Activity} />
-          <Route path={PUBLIC_ACTIVITY} exact component={Activity} />
-          <Route path={FRIENDS} exact component={Friends} />
-          <Route path={HOME} exact component={Home} />
-          {/* <Route path={PROFILE} exact component={Profile} /> */}
+          <Switch>
+            4
+            <Route path={SIGNUP} exact component={SignupOrLogin} />
+            <Route path={LOGIN} exact component={SignupOrLogin} />
+            <Route path={ACTIVITY} exact component={Activity} />
+            <Route path={PUBLIC_ACTIVITY} exact component={Activity} />
+            <Route path={FRIENDS} exact component={Friends} />
+            <Route path={HOME} exact component={Home} />
+            {/* <Route path={PROFILE} exact component={Profile} /> */}
+          </Switch>
         </Layout>
       </Router>
     </UserContext.Provider>

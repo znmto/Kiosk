@@ -10,6 +10,8 @@ import { useSession } from "../Helpers/CustomHooks";
 import firebase from "../FirebaseConfig";
 import { FIREBASE_GET_USER_URL } from "../Constants/api";
 import { User } from "firebase";
+import { ACTIVITY } from "../Constants/routes";
+import { useHistory } from "react-router-dom";
 
 const Home: React.FC = (props) => {
   // const reducer = (state, payload) => ({ ...state, ...payload });
@@ -17,6 +19,7 @@ const Home: React.FC = (props) => {
 
   const theme = useTheme();
   const user: User = useSession();
+  let history = useHistory();
 
   const firestore = firebase.firestore();
   const [feedData, setFeedData] = useState([]);
@@ -39,17 +42,20 @@ const Home: React.FC = (props) => {
   };
 
   useEffect(() => {
-    const listener = firebase
-      .firestore()
-      .collection("users")
-      .doc(user.uid)
-      .onSnapshot((doc) => {
-        const source = doc.metadata.hasPendingWrites;
-        const friends = doc.data() && doc.data()!.friends;
-        return setFriendsArr(friends);
-      });
-    return () => listener();
-  }, [user.uid]);
+    if (user) {
+      const listener = firebase
+        .firestore()
+        .collection("users")
+        .doc(user?.uid)
+        .onSnapshot((doc) => {
+          const source = doc.metadata.hasPendingWrites;
+          const friends = doc.data() && doc.data()!.friends;
+          return setFriendsArr(friends);
+        });
+      return () => listener();
+    }
+    history.push(ACTIVITY);
+  }, [user]);
 
   return (
     <Grid container justify="center" alignItems="center">

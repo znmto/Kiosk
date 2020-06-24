@@ -19,7 +19,7 @@ import {
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Container from "@material-ui/core/Container";
 import firebase from "../FirebaseConfig";
-import { SIGNUP, LOGIN, HOME } from "../Constants/routes";
+import { SIGNUP, LOGIN, HOME, ACTIVITY } from "../Constants/routes";
 import { UserCredential } from "firebase/firebase-auth";
 import { DocumentReference } from "firebase/firebase-app";
 import List from "@material-ui/core/List";
@@ -27,7 +27,9 @@ import ListItem, { ListItemProps } from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
+import LockIcon from "@material-ui/icons/Lock";
 import styled from "styled-components";
+import { useTheme, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
   "@global": {
@@ -72,6 +74,7 @@ const SignupOrLogin = (props) => {
   const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
+  const theme: Theme = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -114,7 +117,7 @@ const SignupOrLogin = (props) => {
         },
       });
       // redirect to home
-      history.push(HOME);
+      history.push(ACTIVITY);
     } catch (error) {
       setAuthError(error.message);
       console.error(error);
@@ -132,7 +135,7 @@ const SignupOrLogin = (props) => {
       );
       const { additionalUserInfo, credential, operationType, user } = res;
       // redirect to home if successful
-      res.user && history.push(HOME);
+      res.user && history.push(ACTIVITY);
     } catch (error) {
       setAuthError(error.message);
       console.error(error);
@@ -164,21 +167,29 @@ const SignupOrLogin = (props) => {
                   }}
                 >
                   <ListItemIcon>
-                    <LockOpenIcon />
+                    {email === "test1@test.com" ? (
+                      <LockIcon htmlColor={theme.palette.success.main} />
+                    ) : (
+                      <LockOpenIcon />
+                    )}
                   </ListItemIcon>
                   <ListItemText primary="test1@test.com / test123" />
                 </ListItem>
                 <ListItem
                   button
                   onClick={() => {
-                    setEmail("test1@test.com");
+                    setEmail("test1@example.com");
                     setPassword("test123");
                   }}
                 >
                   <ListItemIcon>
-                    <LockOpenIcon />
+                    {email === "test1@example.com" ? (
+                      <LockIcon htmlColor={theme.palette.success.main} />
+                    ) : (
+                      <LockOpenIcon />
+                    )}
                   </ListItemIcon>
-                  <ListItemText primary="test1@test.com / test123" />
+                  <ListItemText primary="test1@example.com / test123" />
                 </ListItem>
               </List>
             </CardContent>

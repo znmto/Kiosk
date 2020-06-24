@@ -1,12 +1,17 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const cors = require("cors");
 const express = require("express");
 
 const app = express();
 // Add headers
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  console.log("process.env", process.env);
+  console.log("req", req.headers);
+  const allowedOrigins = ["http://localhost:3000", "https://majora-563d6.web.app"];
+  if (allowedOrigins.indexOf(req.headers.origin) !== -1) {
+    res.set("Access-Control-Allow-Origin", req.headers.origin);
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+  }
   next();
 });
 
@@ -39,13 +44,14 @@ app.get("/getUserByEmail", (req, res) => {
     .catch(error => res.status(500).json({ error: error.toString() }));
 });
 
-app.post("/addFriend", cors({ origin: true, methods: "POST, OPTIONS" }), (req, res) => {
+app.post("/addFriend", (req, res) => {
   const { email, currentUserUid } = req.body;
   const user = { email };
   const getUser = admin.auth().getUserByEmail(user.email);
   getUser
     .then(({ uid }) => (user.uid = uid))
-    .then(async _ => {
+    .then(async something => {
+      console.log("something", something);
       const fields = await admin.firestore.collection("users").doc(currentUserUid);
       const existingFriends = fields.friends;
       const updatedFriends = existingFriends.concat(user);
