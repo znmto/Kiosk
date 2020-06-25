@@ -8,13 +8,14 @@ import debounce from "debounce-promise";
 import isEmpty from "lodash/isEmpty";
 import { FIREBASE_PROXY_URL } from "../Constants/api";
 import chroma from "chroma-js";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme, Theme } from "@material-ui/core/styles";
 import firebase from "../FirebaseConfig";
 import { useSession } from "../Helpers/CustomHooks";
 import { Typography, LinearProgress } from "@material-ui/core";
 import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import Tooltip from "@material-ui/core/Tooltip";
+import { User } from "firebase";
 
 type StyleProps = {
   // x,y location of section in view
@@ -165,8 +166,8 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     } = props;
     const reducer = (state, payload) => ({ ...state, ...payload });
 
-    const theme = useTheme();
-    const user: any = useSession(); // TODO: fix type
+    const theme: Theme = useTheme();
+    const user: User = useSession();
 
     const firestore = firebase.firestore();
     const [state, dispatch] = useReducer(reducer, { selected: {} });
@@ -190,9 +191,27 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       // get user data from DB
       const fields = await firestore.collection("users").doc(user.uid);
       // update field in DB
-      const res = await fields.update({
+      await fields.update({
         [firestoreKey]: optionCopy,
       });
+
+      const docRef = await firestore
+        .collection("media")
+        .doc(optionCopy?.value?.id);
+      console.log("docRef", docRef);
+      const got = docRef.get().then((r) => {
+        console.log("r", r);
+        if (r.exists) {
+          console.log("r.data()", r.data());
+        }
+      });
+      // const
+      // await .set({
+      //   currentlySelectedBy:
+      // })
+      // create array with media id as key?\
+      // if removed, remove
+      // add user id to media matches array
     };
 
     const handleOnFocus = (_) => console.log("onFocus");
@@ -326,7 +345,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       }
       if (publicUserId) {
         console.log("publicUserId", publicUserId);
-        const listener = firebase
+        const publicUserRes = firebase
           .firestore()
           .collection("users")
           .doc(publicUserId)

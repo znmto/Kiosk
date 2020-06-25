@@ -3,9 +3,11 @@ import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { SupervisorAccount, Home, Favorite } from "@material-ui/icons";
 import styled, { StyledProps } from "styled-components";
 import { useHistory, useLocation } from "react-router-dom";
-import { HOME, ACTIVITY, FRIENDS } from "../Constants/routes";
+import { HOME, ACTIVITY, FRIENDS, MATCHES } from "../Constants/routes";
 import { useTheme } from "@material-ui/core/styles";
 import { BottomNavigationProps } from "@material-ui/core/BottomNavigation";
+import { User } from "firebase";
+import { useSession } from "../Helpers/CustomHooks";
 
 interface ExtraProps extends BottomNavigationProps {
   secondary?: any; //TODO: fix type
@@ -31,6 +33,7 @@ const BottomNav: React.FC = (props) => {
 
   console.log("location", location);
   const theme = useTheme();
+  const user: User = useSession();
 
   const navigate = (route: string): void => history.push(route);
 
@@ -38,7 +41,7 @@ const BottomNav: React.FC = (props) => {
     setRoute(location?.pathname);
   }, [location]);
 
-  return (
+  return user ? (
     <StyledBottomNavigation
       value={route}
       showLabels
@@ -57,13 +60,13 @@ const BottomNav: React.FC = (props) => {
         icon={<Favorite />}
       />
       <BottomNavigationAction
-        onClick={(e) => navigate(FRIENDS)}
-        label="Friends"
-        value="/friends"
+        onClick={(e) => navigate(MATCHES)}
+        label="Matches"
+        value="/matches"
         icon={<SupervisorAccount />}
       />
     </StyledBottomNavigation>
-  );
+  ) : null;
 };
 
 export default BottomNav;

@@ -10,6 +10,7 @@ import firebase from "../FirebaseConfig";
 import { useSession } from "../Helpers/CustomHooks";
 import { useTheme } from "@material-ui/core/styles";
 import logo from "../logo.png";
+import { User } from "firebase";
 
 interface StyleProps {
   secondary?: string;
@@ -82,7 +83,7 @@ const StyledTitle = styled(Typography)`
 
 const TopNav: React.FC = (props) => {
   const history = useHistory();
-  const user: any = useSession();
+  const user: User = useSession();
   const theme = useTheme();
 
   const handleProfileClick = () => {

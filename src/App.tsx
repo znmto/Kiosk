@@ -9,14 +9,16 @@ import SignupOrLogin from "./Views/SignupOrLogin";
 import Profile from "./Views/Profile";
 import Home from "./Views/Home";
 import Activity from "./Views/Activity";
-import Friends from "./Views/Friends";
+// import Friends from "./Views/Friends";
 import Layout from "./Views/Layout";
+import Matches from "./Views/Matches";
 import {
   ACTIVITY,
   SIGNUP,
   LOGIN,
   FRIENDS,
   HOME,
+  MATCHES,
   PUBLIC_ACTIVITY,
 } from "./Constants/routes";
 import { useAuth, UserContext, FirestoreContext } from "./Helpers/CustomHooks";
@@ -41,12 +43,12 @@ const App: React.FC = () => {
       <Router>
         <Layout>
           <Switch>
-            4
             <Route path={SIGNUP} exact component={SignupOrLogin} />
             <Route path={LOGIN} exact component={SignupOrLogin} />
             <Route path={ACTIVITY} exact component={Activity} />
             <Route path={PUBLIC_ACTIVITY} exact component={Activity} />
-            <Route path={FRIENDS} exact component={Friends} />
+            {/* <Route path={FRIENDS} exact component={Friends} /> */}
+            <Route path={MATCHES} exact component={Matches} />
             <Route path={HOME} exact component={Home} />
             {/* <Route path={PROFILE} exact component={Profile} /> */}
           </Switch>
