@@ -72,10 +72,8 @@ const Matches: React.FC = (props) => {
             dispatch({ mediaMetadata: doc.data() });
             return doc.data();
           })
-          .then((r) => {
-            console.log("r", r);
-
-            return Promise.all(
+          .then((r) =>
+            Promise.all(
               media.map((k) => {
                 firebase
                   .firestore()
@@ -91,8 +89,8 @@ const Matches: React.FC = (props) => {
                     });
                   });
               })
-            );
-          });
+            )
+          );
 
         // const obj = {};
 
@@ -112,7 +110,7 @@ const Matches: React.FC = (props) => {
       getSetMediaMetadata();
     }
   }, []);
-
+  console.log("user", user);
   return (
     <Grid className={classes.matchesWrapper} container justify="space-between">
       {media.map((m: Media) => {
@@ -125,18 +123,19 @@ const Matches: React.FC = (props) => {
                 alt="media-thumbnail"
                 src={state.mediaMetadata[m.firestoreKey]?.value?.image}
               />
-              {state.usersThatHaveSelected[m.firestoreKey]?.map((u) => {
-                console.log("u", u);
-                return (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferer"
-                    href={`${window.location.origin}/activity/${u}`}
-                  >
-                    {u}
-                  </a>
-                );
-              })}
+              {state.usersThatHaveSelected[m.firestoreKey]?.map(
+                ({ id, email }) => {
+                  return (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferer"
+                      href={`${window.location.origin}/activity/${id}`}
+                    >
+                      {email}
+                    </a>
+                  );
+                }
+              )}
             </Paper>
           </Grid>
         );

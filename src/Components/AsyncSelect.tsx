@@ -183,12 +183,15 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           // add match document if it doesnt exist already
           mediaCollection.doc(optionCopy?.id).set({
             title: optionCopy?.value?.title,
-            currentlySelectedBy: [user.uid],
+            currentlySelectedBy: [{ id: user.uid, email: user.email }],
           });
         } else {
           // otherwise append current uid to collection
           matchFields.update({
-            currentlySelectedBy: [...doc.data()!.currentlySelectedBy, user.uid],
+            currentlySelectedBy: [
+              ...doc.data()!.currentlySelectedBy,
+              { id: user.uid, email: user.email },
+            ],
           });
         }
       });
@@ -340,7 +343,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       matchFields.get().then((r) => {
         if (!r.exists) return;
         const oldArr = r.data()!.currentlySelectedBy;
-        const newArr = oldArr.filter((id) => id !== user.uid);
+        const newArr = oldArr.filter(({ id }) => id !== user.uid);
         matchFields.update({
           currentlySelectedBy: newArr,
         });
