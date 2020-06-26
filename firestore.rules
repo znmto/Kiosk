@@ -4,7 +4,7 @@ service cloud.firestore {
     // Make sure the uid of the requesting user matches name of the user
     // document. The wildcard expression {userId} makes the userId variable
     // available in rules.
-    match /media {
+    match /media/{media} {
       allow read;
       allow update, delete;
       allow create;

@@ -170,17 +170,51 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     const user: User = useSession();
 
     const firestore = firebase.firestore();
-    const [state, dispatch] = useReducer(reducer, { selected: {} });
+    const [state, dispatch] = useReducer(reducer, {
+      selected: {},
+      previouslySelected: null,
+    });
+
+    const updateMatchesInDb = async (optionCopy) => {
+      const collectionRef = await firestore.collection("media");
+      const newDocRef = collectionRef.doc(optionCopy?.id);
+      const oldDocRef = collectionRef.doc(state.previouslySelected);
+      console.log("newDocRef", newDocRef);
+      // add match document if it doesnt exist already
+      newDocRef.get().then((doc) => {
+        if (!doc.exists) {
+          collectionRef.doc(optionCopy?.id).set({
+            title: optionCopy?.value?.title,
+            currentlySelectedBy: [user.uid],
+          });
+        } else {
+          newDocRef.update({
+            currentlySelectedBy: [...doc.data()!.currentlySelectedBy, user.uid],
+          });
+        }
+      });
+
+      //remove id from old collection
+      oldDocRef.get().then((r) => {
+        if (!r.exists) return;
+        const oldArr = r.data()!.currentlySelectedBy;
+        const newArr = oldArr.filter((id) => id !== user.uid);
+        oldDocRef.update({
+          currentlySelectedBy: newArr,
+        });
+      });
+    };
 
     const handleOnChange = async (selectedOption) => {
-      const optionCopy = Object.assign({}, selectedOption);
+      const optionCopy = Object.assign({}, selectedOption, {
+        id: `${firestoreKey}-${selectedOption.value.id}`,
+      });
       // if we need to make a 2nd call to augment the user selection, do it on change
       // very igdb api specific
       if (!isEmpty(additionalRequest)) {
         const additionalResponse = await augmentWithAdditionalRequest(
           optionCopy.value[additionalRequest?.matchFieldName]
         );
-        console.log("additionalResponse", additionalResponse);
         const lowResImageUrl = additionalResponse[0].url;
         const highResImageUrl = lowResImageUrl.replace("t_thumb", "t_original");
         const imageUrl = `https:${highResImageUrl}`;
@@ -190,28 +224,15 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       console.log("optionCopy", optionCopy);
       // get user data from DB
       const fields = await firestore.collection("users").doc(user.uid);
+      console.log("fields", fields);
+
       // update field in DB
       await fields.update({
         [firestoreKey]: optionCopy,
       });
+      window.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>after");
 
-      const docRef = await firestore
-        .collection("media")
-        .doc(optionCopy?.value?.id);
-      console.log("docRef", docRef);
-      const got = docRef.get().then((r) => {
-        console.log("r", r);
-        if (r.exists) {
-          console.log("r.data()", r.data());
-        }
-      });
-      // const
-      // await .set({
-      //   currentlySelectedBy:
-      // })
-      // create array with media id as key?\
-      // if removed, remove
-      // add user id to media matches array
+      updateMatchesInDb(optionCopy);
     };
 
     const handleOnFocus = (_) => console.log("onFocus");
@@ -322,7 +343,20 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
 
     const handleClear = async () => {
       const fields = await firestore.collection("users").doc(user.uid);
+
+      // //grab prev state
+      // const prevFields = await fields.get();
+      // console.log("prevFields", prevFields.data());
+      // if (prevFields.exists) {
+      //   dispatch({
+      //     previouslySelected: prevFields.data()![firestoreKey].id,
+      //   });
+      // }
+
       // remove entry from DB
+      dispatch({
+        previouslySelected: state.selected.id,
+      });
       await fields.update({
         [firestoreKey]: {},
       });
