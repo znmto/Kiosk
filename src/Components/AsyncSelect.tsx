@@ -164,50 +164,39 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       additionalRequest = {},
       publicUserId,
     } = props;
-    const reducer = (state, payload) => ({ ...state, ...payload });
 
     const theme: Theme = useTheme();
     const user: User = useSession();
-
     const firestore = firebase.firestore();
+
+    const reducer = (state, payload) => ({ ...state, ...payload });
     const [state, dispatch] = useReducer(reducer, {
       selected: {},
-      previouslySelected: null,
     });
 
     const updateMatchesInDb = async (optionCopy) => {
-      const collectionRef = await firestore.collection("media");
-      const newDocRef = collectionRef.doc(optionCopy?.id);
-      const oldDocRef = collectionRef.doc(state.previouslySelected);
-      console.log("newDocRef", newDocRef);
-      // add match document if it doesnt exist already
-      newDocRef.get().then((doc) => {
+      const mediaCollection = await firestore.collection("media");
+      const matchFields = mediaCollection.doc(optionCopy?.id);
+
+      matchFields.get().then((doc) => {
         if (!doc.exists) {
-          collectionRef.doc(optionCopy?.id).set({
+          // add match document if it doesnt exist already
+          mediaCollection.doc(optionCopy?.id).set({
             title: optionCopy?.value?.title,
             currentlySelectedBy: [user.uid],
           });
         } else {
-          newDocRef.update({
+          // otherwise append current uid to collection
+          matchFields.update({
             currentlySelectedBy: [...doc.data()!.currentlySelectedBy, user.uid],
           });
         }
-      });
-
-      //remove id from old collection
-      oldDocRef.get().then((r) => {
-        if (!r.exists) return;
-        const oldArr = r.data()!.currentlySelectedBy;
-        const newArr = oldArr.filter((id) => id !== user.uid);
-        oldDocRef.update({
-          currentlySelectedBy: newArr,
-        });
       });
     };
 
     const handleOnChange = async (selectedOption) => {
       const optionCopy = Object.assign({}, selectedOption, {
-        id: `${firestoreKey}-${selectedOption.value.id}`,
+        id: `${firestoreKey}-${selectedOption?.value?.id}`,
       });
       // if we need to make a 2nd call to augment the user selection, do it on change
       // very igdb api specific
@@ -342,22 +331,23 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     };
 
     const handleClear = async () => {
-      const fields = await firestore.collection("users").doc(user.uid);
+      const userFields = await firestore.collection("users").doc(user.uid);
 
-      // //grab prev state
-      // const prevFields = await fields.get();
-      // console.log("prevFields", prevFields.data());
-      // if (prevFields.exists) {
-      //   dispatch({
-      //     previouslySelected: prevFields.data()![firestoreKey].id,
-      //   });
-      // }
-
-      // remove entry from DB
-      dispatch({
-        previouslySelected: state.selected.id,
+      const matchFields = await firestore
+        .collection("media")
+        .doc(state.selected.id);
+      //remove uid from media collection
+      matchFields.get().then((r) => {
+        if (!r.exists) return;
+        const oldArr = r.data()!.currentlySelectedBy;
+        const newArr = oldArr.filter((id) => id !== user.uid);
+        matchFields.update({
+          currentlySelectedBy: newArr,
+        });
       });
-      await fields.update({
+
+      // remove media object from users collection
+      userFields.update({
         [firestoreKey]: {},
       });
     };

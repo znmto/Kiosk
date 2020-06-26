@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useReducer, useEffect } from "react";
 import {
   Button,
   CssBaseline,
@@ -45,27 +45,71 @@ const StyledFriendsWrapper = styled.div`
 const Matches: React.FC = (props) => {
   const classes = useStyles();
   const user: User = useSession();
-  const [mediaMetadata, setMediaMetadata] = useState({});
-  const [matches, setMatches] = useState({
-    hasMovie: [],
-    hasBook: [],
-    hasGame: [],
-    hasTvShow: [],
+
+  const reducer = (state, payload) => ({ ...state, ...payload });
+  const [state, dispatch] = useReducer(reducer, {
+    mediaMetadata: {},
+    usersThatHaveSelected: {},
   });
+  //   const [matches, setMatches] = useState({
+
+  //   });
 
   useEffect(() => {
-    console.log("matches", matches);
+    console.log("state", state);
+  }, [state]);
+  useEffect(() => {
     if (user?.uid) {
-      const userStuff = firebase // TODO: get this from a future context
-        .firestore()
-        .collection("users")
-        .doc(user.uid)
-        .get()
-        .then((doc) => {
-          const media = doc.data() && doc.data();
-          console.log("media", media);
-          setMediaMetadata(media || {});
-        });
+      const getSetMediaMetadata = () => {
+        let mediaMetadata;
+        firebase // TODO: get this from a future context
+          .firestore()
+          .collection("users")
+          .doc(user.uid)
+          .get()
+          .then((doc) => {
+            // mediaMetadata = doc.data();
+            dispatch({ mediaMetadata: doc.data() });
+            return doc.data();
+          })
+          .then((r) => {
+            console.log("r", r);
+
+            return Promise.all(
+              media.map((k) => {
+                firebase
+                  .firestore()
+                  .collection("media")
+                  .doc(r![k.firestoreKey]?.id)
+                  .get()
+                  .then((doc) => {
+                    console.log("doc.data()", doc.data());
+                    const stateCopy = state.usersThatHaveSelected;
+                    stateCopy[k.firestoreKey] = doc.data()!.currentlySelectedBy;
+                    return dispatch({
+                      usersThatHaveSelected: stateCopy,
+                    });
+                  });
+              })
+            );
+          });
+
+        // const obj = {};
+
+        // newMatchesState.then((r) => {
+        //   r.forEach((x) => {
+        //     console.log("x", x);
+        //   });
+        // });
+
+        // dispatch({
+        //   mediaMetadata,
+        //   usersThatHaveSelected: newMatchesState,
+        // });
+
+        console.log("state", state);
+      };
+      getSetMediaMetadata();
     }
   }, []);
 
@@ -79,8 +123,20 @@ const Matches: React.FC = (props) => {
               <img
                 className={classes.matchesMediaThumbnail}
                 alt="media-thumbnail"
-                src={mediaMetadata[m.firestoreKey]?.value?.image}
+                src={state.mediaMetadata[m.firestoreKey]?.value?.image}
               />
+              {state.usersThatHaveSelected[m.firestoreKey]?.map((u) => {
+                console.log("u", u);
+                return (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferer"
+                    href={`${window.location.origin}/activity/${u}`}
+                  >
+                    {u}
+                  </a>
+                );
+              })}
             </Paper>
           </Grid>
         );
