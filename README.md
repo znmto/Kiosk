@@ -9,10 +9,10 @@
 
 ### `Purpose`
 
-This is a WIP social web app to share current media consumption among friends. Of the 4 media categories, Films and TV Series will retrieve data from [OMDB](https://www.omdbapi.com/), Games from [IGDB](https://www.igdb.com/discover) and Books from [Google Books](https://developers.google.com/books).
+This is a WIP social web app to share current media consumption among friends and view recommendations based on selections. Films and TV Series components will retrieve data from [OMDB](https://www.omdbapi.com/), Games from [IGDB](https://www.igdb.com/discover) and Books from [Google Books](https://developers.google.com/books).
 
-React in TS is used client-side, with a Cloud Function acting as a proxy server for API
-calls and DB action triggers. Firestore is used for Authentication and as a Database.
+React with TypeScript is used client-side, with a Cloud Function acting as a proxy server for some API
+calls and DB subscriptions/triggers. Firestore is used for Authentication and as a Database.
 
 Authentication in the client is managed using the React Context API. React-Select is used to search for and persist data from the APIs. All lifecycle events are handled using React Hooks. Styling is achieved with a mix of Styled-Components and Material UI.
 
@@ -23,10 +23,10 @@ Firestore expedites development by providing tooling for the database layer and 
 ### `To Do`
 
 1. Implement feed to view friends' activity.
-2. Implement shareable link for unauthenticated activity sharing.
+2. ~~Implement shareable link for unauthenticated activity sharing.~~
 3. Add Types where missing.
 4. Set up prod credentials/api keys.
 5. UI/UX work.
-6. Local development walkthrough.
+6. ~~Local development walkthrough.~~
 
 ### Created using [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), and [Google Firebase](https://firebase.google.com/).
