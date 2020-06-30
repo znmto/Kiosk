@@ -1,9 +1,16 @@
-import React, { useState, useContext, createContext, useEffect } from "react";
+import React, {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  useReducer,
+} from "react";
 import firebase from "../FirebaseConfig";
 import { User } from "firebase";
 
 export const UserContext = createContext({ user: {} as User });
 export const FirestoreContext = createContext({ document: {} });
+export const SelectionContext = createContext({});
 
 export const useSession = () => {
   const { user } = useContext(UserContext);
@@ -27,4 +34,22 @@ export const useAuth = () => {
   }, []);
 
   return state;
+};
+
+export const SelectionContextProvider = ({ children }) => {
+  const reducer = (state, payload) => ({ ...state, ...payload });
+  const [selections, setSelection] = useReducer(reducer, {
+    movie: {},
+    tvShow: {},
+    game: {},
+    book: {},
+  });
+
+  return (
+    <>
+      <SelectionContext.Provider value={{ selections, setSelection }}>
+        {children}
+      </SelectionContext.Provider>
+    </>
+  );
 };

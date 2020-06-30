@@ -1,17 +1,38 @@
 import React, { useEffect } from "react";
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
-import { SupervisorAccount, Home, Favorite } from "@material-ui/icons";
+import {
+  SupervisorAccount,
+  Home,
+  Favorite,
+  Face,
+  EmojiObjects,
+  Announcement,
+} from "@material-ui/icons";
 import styled, { StyledProps } from "styled-components";
-import { useHistory, useLocation } from "react-router-dom";
-import { HOME, ACTIVITY, FRIENDS, MATCHES } from "../Constants/routes";
-import { useTheme } from "@material-ui/core/styles";
+import { useRouteMatch, useLocation, useHistory } from "react-router-dom";
+import {
+  HOME,
+  ACTIVITY,
+  FRIENDS,
+  MATCHES,
+  PUBLIC_ACTIVITY,
+} from "../Constants/routes";
+import { useTheme, Theme } from "@material-ui/core/styles";
 import { BottomNavigationProps } from "@material-ui/core/BottomNavigation";
 import { User } from "firebase";
 import { useSession } from "../Helpers/CustomHooks";
 
-interface ExtraProps extends BottomNavigationProps {
+type ExtraProps = {
   secondary?: any; //TODO: fix type
-}
+};
+
+// type MatchParams = {
+//   params: Params;
+// };
+
+// type Params = {
+//   publicUid: string;
+// };
 
 const StyledBottomNavigation = styled(BottomNavigation)`
   width: 100%;
@@ -28,18 +49,31 @@ const StyledBottomNavigation = styled(BottomNavigation)`
 const BottomNav: React.FC = (props) => {
   let location = useLocation();
   let history = useHistory();
+  let { params: { publicUid = "" } = {} } =
+    (useRouteMatch({
+      path: PUBLIC_ACTIVITY,
+      exact: true,
+      strict: true,
+    }) as any) || {}; // TODO: react-router exposed types incorrect
+
   // default view
   const [route, setRoute] = React.useState(location?.pathname);
 
   console.log("location", location);
-  const theme = useTheme();
+  const theme: Theme = useTheme();
   const user: User = useSession();
 
   const navigate = (route: string): void => history.push(route);
 
   useEffect(() => {
+    console.log("location", location);
+    console.log("history", history);
+    console.log("match", publicUid);
+    console.log("route", route);
+    // user.whatever = 1;
+    console.log("user", user);
     setRoute(location?.pathname);
-  }, [location]);
+  }, [location, history, publicUid]);
 
   return user ? (
     <StyledBottomNavigation
@@ -47,12 +81,12 @@ const BottomNav: React.FC = (props) => {
       showLabels
       secondary={theme.palette.secondary.main}
     >
-      <BottomNavigationAction
+      {/* <BottomNavigationAction
         onClick={(e) => navigate(HOME)}
         label="Home"
         value="/home"
         icon={<Home />}
-      />
+      /> */}
       <BottomNavigationAction
         onClick={(e) => navigate(ACTIVITY)}
         label="My Activity"
@@ -63,8 +97,16 @@ const BottomNav: React.FC = (props) => {
         onClick={(e) => navigate(MATCHES)}
         label="Matches"
         value="/matches"
-        icon={<SupervisorAccount />}
+        icon={<Announcement />}
       />
+      {publicUid && (
+        <BottomNavigationAction
+          onClick={() => {}}
+          label="Public Profile"
+          value={route}
+          icon={<Face />}
+        />
+      )}
     </StyledBottomNavigation>
   ) : null;
 };

@@ -16,12 +16,16 @@ import {
   ACTIVITY,
   SIGNUP,
   LOGIN,
-  FRIENDS,
+  LANDING,
   HOME,
   MATCHES,
   PUBLIC_ACTIVITY,
 } from "./Constants/routes";
-import { useAuth, UserContext, FirestoreContext } from "./Helpers/CustomHooks";
+import {
+  useAuth,
+  UserContext,
+  SelectionContextProvider,
+} from "./Helpers/CustomHooks";
 import { UserCredential } from "firebase/firebase-auth";
 import { CircularProgress, Grid } from "@material-ui/core";
 
@@ -40,20 +44,25 @@ const App: React.FC = () => {
   }
   return (
     <UserContext.Provider value={{ user }}>
-      <Router>
-        <Layout>
-          <Switch>
-            <Route path={SIGNUP} exact component={SignupOrLogin} />
-            <Route path={LOGIN} exact component={SignupOrLogin} />
-            <Route path={ACTIVITY} exact component={Activity} />
-            <Route path={PUBLIC_ACTIVITY} exact component={Activity} />
-            {/* <Route path={FRIENDS} exact component={Friends} /> */}
-            <Route path={MATCHES} exact component={Matches} />
-            <Route path={HOME} exact component={Home} />
-            {/* <Route path={PROFILE} exact component={Profile} /> */}
-          </Switch>
-        </Layout>
-      </Router>
+      <SelectionContextProvider>
+        <Router>
+          <Layout>
+            <Switch>
+              <Route
+                path={LANDING}
+                exact
+                render={() => <Redirect to={ACTIVITY} />}
+              />
+              <Route path={SIGNUP} exact component={SignupOrLogin} />
+              <Route path={LOGIN} exact component={SignupOrLogin} />
+              <Route path={ACTIVITY} exact component={Activity} />
+              <Route path={PUBLIC_ACTIVITY} exact component={Activity} />
+              <Route path={MATCHES} exact component={Matches} />
+              <Route path={HOME} exact component={Home} />
+            </Switch>
+          </Layout>
+        </Router>
+      </SelectionContextProvider>
     </UserContext.Provider>
   );
 };

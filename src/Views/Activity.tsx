@@ -8,6 +8,7 @@ import { FIREBASE_GET_ID_URL } from "../Constants/api";
 import { User } from "firebase";
 import ClipBoardCopy from "../Components/CopyToClipboard";
 import { media, Media } from "../Constants/media";
+import { SentimentSatisfiedAltSharp } from "@material-ui/icons";
 
 type StyleProps = {
   color?: string;
@@ -57,6 +58,8 @@ interface ActivityProps {
 
 const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const { match: { params = {} } = {} } = props;
+  const publicUid = params?.publicUid;
+
   const [publicUser, setPublicUser] = useState<PublicUser>();
   const theme: Theme = useTheme();
   const user: User = useSession();
@@ -80,12 +83,15 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
     }
   };
   useEffect(() => {
-    !user && getUserNamesById([params?.uid]);
+    console.log("publicUid", publicUid);
+    if (publicUid) {
+      getUserNamesById([publicUid]);
+    }
   }, []);
   console.log("window.location", window.location);
   return (
     <>
-      {user ? (
+      {!publicUid ? (
         <StyledShareableLinkContainer>
           <ClipBoardCopy />
         </StyledShareableLinkContainer>
@@ -95,7 +101,7 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
       <StyledMediaSelectionWrapper>
         {/* <StyledCenteredDivider color={theme.palette.primary.main}><FaTimes/></StyledCenteredDivider> */}
         {media.map((m: Media) => (
-          <AsyncSelect publicUserId={params?.uid} key={m.label} {...m} />
+          <AsyncSelect publicUserId={publicUid} key={m.label} {...m} />
         ))}
       </StyledMediaSelectionWrapper>
     </>

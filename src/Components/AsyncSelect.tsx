@@ -1,6 +1,6 @@
 import "isomorphic-fetch";
 import axios from "axios";
-import React, { useEffect, useReducer, memo } from "react";
+import React, { useEffect, useReducer, memo, useContext } from "react";
 import AsyncSelect from "react-select/async";
 import styled from "styled-components";
 import debounce from "debounce-promise";
@@ -10,7 +10,7 @@ import { FIREBASE_PROXY_URL } from "../Constants/api";
 import chroma from "chroma-js";
 import { useTheme, Theme } from "@material-ui/core/styles";
 import firebase from "../FirebaseConfig";
-import { useSession } from "../Helpers/CustomHooks";
+import { useSession, SelectionContext } from "../Helpers/CustomHooks";
 import { Typography, LinearProgress } from "@material-ui/core";
 import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
@@ -80,20 +80,23 @@ const StyledActionIconsContainer = styled.div`
   justify-content: space-around;
 `;
 
-const StyledTrashIconContainer = styled.div`
-  color: ${({ danger = "" }: StyleProps) => danger};
+const StlyedActionIcon = styled.div`
   grid-row: 1;
+  margin: 0 auto;
   cursor: pointer;
-  font-size: 24px;
+  svg {
+    font-size: 32px;
+  }
 `;
 
-const StyledExternalLinkIconContainer = styled.div`
+const StyledTrashIconContainer = styled(StlyedActionIcon)`
+  color: ${({ danger = "" }: StyleProps) => danger};
+`;
+
+const StyledExternalLinkIconContainer = styled(StlyedActionIcon)`
   & > a {
     color: ${({ primary = "" }: StyleProps) => primary};
   }
-  grid-row: 1;
-  cursor: pointer;
-  font-size: 24px;
 `;
 
 const selectStyles = {
@@ -169,10 +172,12 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     const user: User = useSession();
     const firestore = firebase.firestore();
 
-    const reducer = (state, payload) => ({ ...state, ...payload });
-    const [state, dispatch] = useReducer(reducer, {
-      selected: {},
-    });
+    const { selections, setSelection }: any = useContext(SelectionContext);
+    const selected = selections[firestoreKey] || {};
+    // const reducer = (state, payload) => ({ ...state, ...payload });
+    // const [state, dispatch] = useReducer(reducer, {
+    //   selected: {},
+    // });
 
     const updateMatchesInDb = async (optionCopy) => {
       const mediaCollection = await firestore.collection("media");
@@ -300,17 +305,16 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     };
 
     const getImage = () => {
-      const { selected: { value: { image = "" } = {} } = {} } = state;
-      if (!isEmpty(state.selected))
-        return <img alt="media-cover" src={image} />;
+      console.log("selections", selections);
+      const { value: { image = "" } = {} } = selected;
+      console.log("selected", selected);
+      if (!isEmpty(selected)) return <img alt="media-cover" src={image} />;
       return <></>;
     };
 
     const getDecription = () => {
-      const {
-        selected: { value: { title = "", subtitle = "", id = "" } = {} } = {},
-      } = state;
-      if (!isEmpty(state.selected)) {
+      const { value: { title = "", subtitle = "", id = "" } = {} } = selected;
+      if (!isEmpty(selected)) {
         return (
           <StyledDescriptionContainer>
             <Typography component="h1" variant="h4">
@@ -318,7 +322,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
               <a
                 href={
                   // `${externalUrl}${id}`
-                  externalUrlFormatter(state.selected)
+                  externalUrlFormatter(selected)
                 }
                 rel="noopener noreferrer"
               >
@@ -336,9 +340,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     const handleClear = async () => {
       const userFields = await firestore.collection("users").doc(user.uid);
 
-      const matchFields = await firestore
-        .collection("media")
-        .doc(state.selected.id);
+      const matchFields = await firestore.collection("media").doc(selected.id);
       //remove uid from media collection
       matchFields.get().then((r) => {
         if (!r.exists) return;
@@ -356,7 +358,10 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     };
 
     useEffect(() => {
-      console.log("user?.uid", user?.uid);
+      console.log("selections", selections);
+    });
+
+    useEffect(() => {
       if (user?.uid) {
         const listener = firebase
           .firestore()
@@ -365,7 +370,9 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           .onSnapshot((doc) => {
             const source = doc.metadata.hasPendingWrites;
             const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
-            return dispatch({ selected });
+            console.log("api response", selected);
+            return setSelection({ [firestoreKey]: selected });
+            // return dispatch({ selected });
           });
         // unsubscribe listener
         return () => listener();
@@ -379,46 +386,45 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           .get()
           .then((doc) => {
             const selected = doc.data() && doc.data()![firestoreKey];
-            return dispatch({ selected });
+            return setSelection({ [firestoreKey]: selected });
+            // return dispatch({ selected });
           });
       }
     }, [firestoreKey, user, publicUserId]);
-
     return (
       <StyledMediaSelectorWrapper
         quadrant={quadrant}
         primary={theme.palette.primary.main}
       >
-        {!isEmpty(state.selected) && !publicUserId && (
-          <StyledActionIconsContainer>
-            <StyledTrashIconContainer
-              danger={theme.palette.error.main}
-              onClick={handleClear}
-            >
-              <Tooltip title="Delete">
-                <HighlightOffOutlinedIcon />
-              </Tooltip>
-            </StyledTrashIconContainer>
-            <StyledExternalLinkIconContainer
-              primary={theme.palette.primary.main}
-            >
-              <Tooltip title="Open in new tab">
-                <a
-                  href={externalUrlFormatter(state.selected)}
-                  rel="noopener noreferrer"
-                >
-                  <OpenInNewIcon />
-                </a>
-              </Tooltip>
-            </StyledExternalLinkIconContainer>
-          </StyledActionIconsContainer>
+        {!isEmpty(selected) && !publicUserId ? (
+          // <StyledActionIconsContainer>
+          <StyledTrashIconContainer
+            danger={theme.palette.error.main}
+            onClick={handleClear}
+          >
+            <Tooltip title="Delete">
+              <HighlightOffOutlinedIcon />
+            </Tooltip>
+          </StyledTrashIconContainer>
+        ) : (
+          <StyledExternalLinkIconContainer primary={theme.palette.primary.main}>
+            <Tooltip title="Open in new tab">
+              <a
+                href={externalUrlFormatter(selected)}
+                rel="noopener noreferrer"
+              >
+                <OpenInNewIcon />
+              </a>
+            </Tooltip>
+          </StyledExternalLinkIconContainer>
+          // </StyledActionIconsContainer>
         )}
         {getImage()}
         {getDecription()}
-        {isEmpty(state.selected) && (
+        {isEmpty(selected) && (
           <StyledAsyncSelectWrapper>
             <AsyncSelect
-              value={state.selected}
+              value={selected}
               // cacheOptions
               loadOptions={debounce(handleLoadOptions, 500, { leading: true })}
               defaultOptions={true}
