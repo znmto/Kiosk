@@ -11,11 +11,13 @@ import chroma from "chroma-js";
 import { useTheme, Theme } from "@material-ui/core/styles";
 import firebase from "../FirebaseConfig";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
-import { Typography, LinearProgress } from "@material-ui/core";
+import { Typography, LinearProgress, Link } from "@material-ui/core";
 import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import Tooltip from "@material-ui/core/Tooltip";
 import { User } from "firebase";
+import { AdditionalRequest } from "../Types/common";
+import { useHistory } from "react-router-dom";
 
 type StyleProps = {
   // x,y location of section in view
@@ -47,13 +49,13 @@ const StyledIconWrapper = styled.div`
     const borderCommon = `1px solid #eee`;
     const quadStyleMap = {
       "1,1": `justify-self: end;
-        align-self: end; border-bottom: ${borderCommon}; border-right: ${borderCommon}; padding: 120px 60px 60px 120px`,
+        align-self: end; border-bottom: ${borderCommon}; border-right: ${borderCommon}; padding: 120px 40px 40px 120px`,
       "1,2": `justify-self: end;
-        align-self: start; border-top: ${borderCommon}; border-right: ${borderCommon}; padding: 60px 60px 120px 120px`,
+        align-self: start; border-top: ${borderCommon}; border-right: ${borderCommon}; padding: 40px 40px 120px 120px`,
       "2,1": `justify-self: start;
-        align-self: end; border-bottom: ${borderCommon}; border-left: ${borderCommon}; padding: 120px 120px 60px 60px`,
+        align-self: end; border-bottom: ${borderCommon}; border-left: ${borderCommon}; padding: 120px 120px 40px 40px`,
       "2,2": `justify-self: start;
-        align-self: start; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 60px 120px 120px 60px`,
+        align-self: start; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 40px 120px 120px 40px`,
     };
     return quadStyleMap[quadrant.join()];
   }};
@@ -77,7 +79,7 @@ const StyledDescriptionContainer = styled.div`
 
 const StyledActionIconsContainer = styled.div`
   display: grid;
-  justify-content: space-around;
+  justify-content: space-evenly;
 `;
 
 const StlyedActionIcon = styled.div`
@@ -138,14 +140,14 @@ type AsyncSelectWrapper = {
   headers: any;
   method: string;
   data?: any;
-  dataFormatter?: any;
+  dataFormatter?: (string) => string;
   searchParam?: string;
   schemaParser: any;
   icon: React.ReactElement;
   firestoreKey: string;
   quadrant: number[];
-  externalUrlFormatter: any;
-  additionalRequest?: any;
+  externalUrlFormatter: (string) => string;
+  additionalRequest?: AdditionalRequest;
   publicUserId?: string;
 };
 
@@ -161,24 +163,20 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       searchParam,
       schemaParser,
       icon,
-      firestoreKey = "",
-      quadrant = [],
+      firestoreKey,
+      quadrant,
       externalUrlFormatter,
-      additionalRequest = {},
+      additionalRequest,
       publicUserId,
     } = props;
 
     const theme: Theme = useTheme();
     const user: User = useSession();
+    const history = useHistory();
     const firestore = firebase.firestore();
 
     const { selections, setSelection }: any = useContext(SelectionContext);
     const selected = selections[firestoreKey] || {};
-    // const reducer = (state, payload) => ({ ...state, ...payload });
-    // const [state, dispatch] = useReducer(reducer, {
-    //   selected: {},
-    // });
-
     const updateMatchesInDb = async (optionCopy) => {
       const mediaCollection = await firestore.collection("media");
       const matchFields = mediaCollection.doc(optionCopy?.id);
@@ -210,7 +208,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       // very igdb api specific
       if (!isEmpty(additionalRequest)) {
         const additionalResponse = await augmentWithAdditionalRequest(
-          optionCopy.value[additionalRequest?.matchFieldName]
+          optionCopy?.value[additionalRequest!.matchFieldName]
         );
         const lowResImageUrl = additionalResponse[0].url;
         const highResImageUrl = lowResImageUrl.replace("t_thumb", "t_original");
@@ -247,7 +245,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
         method,
         headers,
         description,
-      } = props.additionalRequest;
+      } = props.additionalRequest!;
       window.console.log(`additional request initated to ${description}`);
       try {
         const { data: response } = await axios({
@@ -305,9 +303,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     };
 
     const getImage = () => {
-      console.log("selections", selections);
       const { value: { image = "" } = {} } = selected;
-      console.log("selected", selected);
       if (!isEmpty(selected)) return <img alt="media-cover" src={image} />;
       return <></>;
     };
@@ -319,15 +315,12 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           <StyledDescriptionContainer>
             <Typography component="h1" variant="h4">
               {/* TODO: change this to open recommendations */}
-              <a
-                href={
-                  // `${externalUrl}${id}`
-                  externalUrlFormatter(selected)
-                }
-                rel="noopener noreferrer"
+              <Link
+                style={{ cursor: "pointer" }}
+                onClick={() => history.push(`matches/${firestoreKey}`)}
               >
                 {title}
-              </a>
+              </Link>
             </Typography>
             <Typography component="h1" variant="h5">
               {subtitle}
@@ -339,7 +332,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
 
     const handleClear = async () => {
       const userFields = await firestore.collection("users").doc(user.uid);
-
       const matchFields = await firestore.collection("media").doc(selected.id);
       //remove uid from media collection
       matchFields.get().then((r) => {
@@ -370,15 +362,12 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           .onSnapshot((doc) => {
             const source = doc.metadata.hasPendingWrites;
             const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
-            console.log("api response", selected);
             return setSelection({ [firestoreKey]: selected });
-            // return dispatch({ selected });
           });
         // unsubscribe listener
         return () => listener();
       }
       if (publicUserId) {
-        console.log("publicUserId", publicUserId);
         const publicUserRes = firebase
           .firestore()
           .collection("users")
@@ -387,7 +376,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           .then((doc) => {
             const selected = doc.data() && doc.data()![firestoreKey];
             return setSelection({ [firestoreKey]: selected });
-            // return dispatch({ selected });
           });
       }
     }, [firestoreKey, user, publicUserId]);
@@ -396,29 +384,33 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
         quadrant={quadrant}
         primary={theme.palette.primary.main}
       >
-        {!isEmpty(selected) && !publicUserId ? (
-          // <StyledActionIconsContainer>
-          <StyledTrashIconContainer
-            danger={theme.palette.error.main}
-            onClick={handleClear}
-          >
-            <Tooltip title="Delete">
-              <HighlightOffOutlinedIcon />
-            </Tooltip>
-          </StyledTrashIconContainer>
-        ) : (
-          <StyledExternalLinkIconContainer primary={theme.palette.primary.main}>
-            <Tooltip title="Open in new tab">
-              <a
-                href={externalUrlFormatter(selected)}
-                rel="noopener noreferrer"
-              >
-                <OpenInNewIcon />
-              </a>
-            </Tooltip>
-          </StyledExternalLinkIconContainer>
-          // </StyledActionIconsContainer>
-        )}
+        <StyledActionIconsContainer>
+          {!isEmpty(selected) && !publicUserId && (
+            <StyledTrashIconContainer
+              danger={theme.palette.error.main}
+              onClick={handleClear}
+            >
+              <Tooltip title="Delete">
+                <HighlightOffOutlinedIcon />
+              </Tooltip>
+            </StyledTrashIconContainer>
+          )}
+
+          {!isEmpty(selected) && (
+            <StyledExternalLinkIconContainer
+              primary={theme.palette.primary.main}
+            >
+              <Tooltip title="Open in new tab">
+                <a
+                  href={externalUrlFormatter(selected)}
+                  rel="noopener noreferrer"
+                >
+                  <OpenInNewIcon />
+                </a>
+              </Tooltip>
+            </StyledExternalLinkIconContainer>
+          )}
+        </StyledActionIconsContainer>
         {getImage()}
         {getDecription()}
         {isEmpty(selected) && (

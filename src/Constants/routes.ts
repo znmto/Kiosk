@@ -8,3 +8,4 @@ export const ACTIVITY: string = "/activity";
 export const PUBLIC_ACTIVITY: string = "/activity/:publicUid";
 export const PASSWORD_FORGET: string = "/password_forget";
 export const MATCHES: string = "/matches";
+export const MATCHES_FILTER: string = "/matches/:showOnly";

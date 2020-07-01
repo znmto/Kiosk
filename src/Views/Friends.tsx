@@ -62,7 +62,7 @@ const Friends: React.FC = (props) => {
   const [friendsArr, setFriendsArr] = useState([]);
   const user: User = useSession();
 
-  const setFriend = (e) => {
+  const setFriend = (e: string) => {
     const trimmed = e.trim();
     setFriendEmail(trimmed);
   };
@@ -125,7 +125,9 @@ const Friends: React.FC = (props) => {
             autoComplete="email"
             autoFocus
             value={friendEmail}
-            onChange={(e) => setFriend(e.target.value)}
+            onChange={(e: React.ChangeEvent<{ value: string }>) =>
+              setFriend(e.target.value)
+            }
           />
           <div className={classes.authError}>
             <h3>{authError}</h3>
@@ -136,7 +138,9 @@ const Friends: React.FC = (props) => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={(e) => handleAddFriend(e)}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+              handleAddFriend(e)
+            }
           >
             ADd
           </Button>

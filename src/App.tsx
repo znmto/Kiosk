@@ -19,6 +19,7 @@ import {
   LANDING,
   HOME,
   MATCHES,
+  MATCHES_FILTER,
   PUBLIC_ACTIVITY,
 } from "./Constants/routes";
 import {
@@ -58,6 +59,7 @@ const App: React.FC = () => {
               <Route path={ACTIVITY} exact component={Activity} />
               <Route path={PUBLIC_ACTIVITY} exact component={Activity} />
               <Route path={MATCHES} exact component={Matches} />
+              <Route path={MATCHES_FILTER} exact component={Matches} />
               <Route path={HOME} exact component={Home} />
             </Switch>
           </Layout>

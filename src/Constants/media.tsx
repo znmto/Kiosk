@@ -11,6 +11,7 @@ import {
   MdChromeReaderMode,
 } from "react-icons/md";
 import { IconBaseProps } from "react-icons/lib";
+import { AdditionalRequest } from "../Types/common";
 
 export type Media = {
   label: string;
@@ -18,7 +19,7 @@ export type Media = {
   quadrant: number[];
   url: string;
   method: string;
-  headers: Headers;
+  headers: any;
   schemaParser: any;
   firestoreKey: string;
   searchParam?: string;
@@ -27,12 +28,6 @@ export type Media = {
   externalUrlFormatter: (arg1: any) => string;
 };
 
-type Headers = {
-  [key: string]: string;
-};
-type AdditionalRequest = {
-  [key: string]: string | Headers;
-};
 export const media: Media[] = [
   {
     label: "Movie",
