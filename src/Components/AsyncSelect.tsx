@@ -332,7 +332,10 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
 
     const handleClear = async () => {
       const userFields = await firestore.collection("users").doc(user.uid);
-      const matchFields = await firestore.collection("media").doc(selected.id);
+      console.log("selected", selected);
+      const matchFields = await firestore
+        .collection("media")
+        .doc(selected?.value?.id);
       //remove uid from media collection
       matchFields.get().then((r) => {
         if (!r.exists) return;

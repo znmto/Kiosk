@@ -32,7 +32,7 @@ const ClipBoardCopy = memo(() => {
 
   const reducer = (state, payload) => ({ ...state, ...payload });
   const [state, dispatch] = useReducer(reducer, {
-    value: `${window.location.origin}/activity/${user.uid}`,
+    value: `${window.location.origin}/activity/${user?.uid}`,
     copied: false,
     showTooltip: false,
   });

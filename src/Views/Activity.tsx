@@ -9,6 +9,8 @@ import { User } from "firebase";
 import ClipBoardCopy from "../Components/CopyToClipboard";
 import { media, Media } from "../Constants/media";
 import { SentimentSatisfiedAltSharp } from "@material-ui/icons";
+import { LOGIN } from "../Constants/routes";
+import { useHistory } from "react-router-dom";
 
 type StyleProps = {
   color?: string;
@@ -63,6 +65,7 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const [publicUser, setPublicUser] = useState<PublicUser>();
   const theme: Theme = useTheme();
   const user: User = useSession();
+  const history = useHistory();
 
   const getUserNamesById = async (userIdArr: string[]) => {
     console.log("userIdArr", userIdArr);
@@ -84,6 +87,7 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   };
   useEffect(() => {
     console.log("publicUid", publicUid);
+    if (!publicUid && !user) return history.push(LOGIN);
     if (publicUid) {
       getUserNamesById([publicUid]);
     }
