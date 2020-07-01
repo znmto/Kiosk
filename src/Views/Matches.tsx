@@ -1,24 +1,8 @@
 import React, { useReducer, useEffect, useContext } from "react";
-import {
-  Button,
-  CssBaseline,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Link,
-  Grid,
-  Box,
-  Typography,
-  makeStyles,
-  Theme,
-  Paper,
-} from "@material-ui/core";
+import { Grid, makeStyles, Theme, Paper } from "@material-ui/core";
 import styled from "styled-components";
-import axios from "axios";
-import debounce from "lodash/debounce";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
 import firebase from "../FirebaseConfig";
-import { FIREBASE_GET_USER_URL } from "../Constants/api";
 import { User } from "firebase";
 import { media, Media } from "../Constants/media";
 import isEmpty from "lodash/isEmpty";
@@ -45,11 +29,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 type MatchesParams = {
   showOnly?: string;
 };
-
-const StyledFriendsWrapper = styled.div`
-  width: 500px;
-  margin: 20% auto;
-`;
 
 const Matches: React.FC = (props) => {
   const classes = useStyles();

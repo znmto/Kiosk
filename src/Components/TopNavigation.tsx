@@ -100,10 +100,10 @@ const TopNav: React.FC = (props) => {
   };
   return (
     <StyledTopNavigation>
-      <div className="logoWrapper" onClick={(_) => history.push(HOME)}>
+      <div className="logoWrapper" onClick={(_) => history.push(ACTIVITY)}>
         <img alt="Kiosk Logo" src={logo} />
       </div>
-      <StyledTitle variant="h2" onClick={(_) => history.push(HOME)}>
+      <StyledTitle variant="h2" onClick={(_) => history.push(ACTIVITY)}>
         Kiosk
       </StyledTitle>
       <StyledAccountButtonWrapper
