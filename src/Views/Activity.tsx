@@ -1,5 +1,6 @@
-import React, { memo, useState, useEffect } from "react";
+import React, { memo, useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { makeStyles } from "@material-ui/core";
 import { useTheme, Theme } from "@material-ui/core/styles";
 import styled from "styled-components";
 import AsyncSelect from "../Components/AsyncSelect";
@@ -8,9 +9,11 @@ import { FIREBASE_GET_ID_URL } from "../Constants/api";
 import { User } from "firebase";
 import ClipBoardCopy from "../Components/CopyToClipboard";
 import { media, Media } from "../Constants/media";
-import { SentimentSatisfiedAltSharp } from "@material-ui/icons";
 import { LOGIN } from "../Constants/routes";
+import Avatar from "@material-ui/core/Avatar";
+import { SelectionContext } from "../Helpers/CustomHooks";
 import { useHistory } from "react-router-dom";
+import { Typography, Grid } from "@material-ui/core";
 
 type StyleProps = {
   color?: string;
@@ -26,33 +29,16 @@ const StyledMediaSelectionWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   justify-content: space-evenly;
 `;
-const StyledPublicUserInfo = styled.h2`
-  display: grid;
-  justify-content: center;
-`;
 
-const StyledCenteredDivider = styled.div`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: rotate(45deg) translate(-50%, 25%);
-  color: ${(props: StyleProps) => props.color};
-  font-size: 40px;
-  font-weight: 100;
-  & svg {
-    stroke-width: 0.2;
-  }
-`;
-
-const StyledShareableLinkContainer = styled.div`
-  display: grid;
-  justify-content: center;
-  padding: 40px 0 20px;
-  & input {
-    width: 300px;
-    padding: 5px;
-  }
-`;
+const useStyles = makeStyles((theme: Theme) => ({
+  shareableLinkContainer: {
+    padding: "40px 0 20px",
+    "& input": {
+      width: "300px",
+      padding: "5px",
+    },
+  },
+}));
 
 interface ActivityProps {
   match?: any;
@@ -65,10 +51,11 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const [publicUser, setPublicUser] = useState<PublicUser>();
   const theme: Theme = useTheme();
   const user: User = useSession();
+  const classes = useStyles();
   const history = useHistory();
+  const { metadata }: any = useContext(SelectionContext);
 
   const getUserNamesById = async (userIdArr: string[]) => {
-    console.log("userIdArr", userIdArr);
     const userIdParam = userIdArr.join(",");
     try {
       const { data } = await axios({
@@ -86,24 +73,34 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
     }
   };
   useEffect(() => {
-    console.log("publicUid", publicUid);
     if (!publicUid && !user) return history.push(LOGIN);
     if (publicUid) {
       getUserNamesById([publicUid]);
     }
   }, []);
-  console.log("window.location", window.location);
   return (
     <>
       {!publicUid ? (
-        <StyledShareableLinkContainer>
+        <Grid
+          className={classes.shareableLinkContainer}
+          container
+          justify="center"
+        >
           <ClipBoardCopy />
-        </StyledShareableLinkContainer>
+        </Grid>
       ) : (
-        <StyledPublicUserInfo>{`${publicUser?.email}'s List`}</StyledPublicUserInfo>
+        <>
+          <Grid style={{ paddingTop: 15 }} container justify="center">
+            <Avatar
+              style={{ margin: "0 15px" }}
+              alt={publicUser?.email || ""}
+              src={metadata?.publicUser?.avatar}
+            />
+            <Typography variant="h5">{`${publicUser?.email}'s List`}</Typography>
+          </Grid>
+        </>
       )}
       <StyledMediaSelectionWrapper>
-        {/* <StyledCenteredDivider color={theme.palette.primary.main}><FaTimes/></StyledCenteredDivider> */}
         {media.map((m: Media) => (
           <AsyncSelect publicUserId={publicUid} key={m.label} {...m} />
         ))}

@@ -7,6 +7,7 @@ import { User } from "firebase";
 import { media, Media } from "../Constants/media";
 import isEmpty from "lodash/isEmpty";
 import { useParams } from "react-router-dom";
+import Avatar from "@material-ui/core/Avatar";
 
 const useStyles = makeStyles((theme: Theme) => ({
   matchesMediaThumbnail: { width: 150, borderRadius: 6 },
@@ -35,7 +36,7 @@ const Matches: React.FC = (props) => {
   const user: User = useSession();
   const params = useParams<MatchesParams>();
   console.log("params", params);
-  const { selections, setSelection }: any = useContext(SelectionContext);
+  const { selections, _ }: any = useContext(SelectionContext);
 
   const reducer = (state, payload) => ({ ...state, ...payload });
   const [state, dispatch] = useReducer(reducer, {
@@ -94,15 +95,22 @@ const Matches: React.FC = (props) => {
                 src={selections[m.firestoreKey]?.value?.image}
               />
               {state.usersThatHaveSelected[m.firestoreKey]?.map(
-                ({ id, email }) => {
+                ({ id, email, avatar, fullName }) => {
                   return (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={`${window.location.origin}/activity/${id}`}
-                    >
-                      {email}
-                    </a>
+                    <div>
+                      <Avatar
+                        style={{ margin: "0 15px" }}
+                        alt={email}
+                        src={avatar}
+                      />
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`${window.location.origin}/activity/${id}`}
+                      >
+                        {email}
+                      </a>
+                    </div>
                   );
                 }
               )}

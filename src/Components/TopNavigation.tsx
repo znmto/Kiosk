@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import IconButton from "@material-ui/core/IconButton";
 import { AccountCircle, ExitToApp } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
+import Avatar from "@material-ui/core/Avatar";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { HOME, ACTIVITY } from "../Constants/routes";
 import { LOGIN } from "../Constants/routes";
 import firebase from "../FirebaseConfig";
-import { useSession } from "../Helpers/CustomHooks";
+import { useSession, SelectionContext } from "../Helpers/CustomHooks";
 import { useTheme } from "@material-ui/core/styles";
 import logo from "../logo.png";
 import { User } from "firebase";
+import isEmpty from "lodash/isEmpty";
 
 interface StyleProps {
   secondary?: string;
@@ -85,7 +87,7 @@ const TopNav: React.FC = (props) => {
   const history = useHistory();
   const user: User = useSession();
   const theme = useTheme();
-
+  const { metadata }: any = useContext(SelectionContext);
   const handleProfileClick = () => {
     // if session, redirect to account
     // else redirect to login
@@ -111,7 +113,11 @@ const TopNav: React.FC = (props) => {
         secondary={theme.palette.secondary.main}
       >
         <IconButton aria-label="account">
-          <AccountCircle />
+          {!isEmpty(metadata.user) ? (
+            <Avatar alt={user?.email || ""} src={metadata?.user?.avatar} />
+          ) : (
+            <AccountCircle />
+          )}
         </IconButton>
       </StyledAccountButtonWrapper>
       {user && (

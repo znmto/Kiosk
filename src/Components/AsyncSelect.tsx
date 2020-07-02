@@ -1,10 +1,9 @@
 import "isomorphic-fetch";
 import axios from "axios";
-import React, { useEffect, useReducer, memo, useContext } from "react";
+import React, { useEffect, memo, useContext } from "react";
 import AsyncSelect from "react-select/async";
 import styled from "styled-components";
 import debounce from "debounce-promise";
-// import debounce from "lodash/debounce";
 import isEmpty from "lodash/isEmpty";
 import { FIREBASE_PROXY_URL } from "../Constants/api";
 import chroma from "chroma-js";
@@ -18,6 +17,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { User } from "firebase";
 import { AdditionalRequest } from "../Types/common";
 import { useHistory } from "react-router-dom";
+import { AssignmentReturnRounded } from "@material-ui/icons";
 
 type StyleProps = {
   // x,y location of section in view
@@ -175,25 +175,32 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     const history = useHistory();
     const firestore = firebase.firestore();
 
-    const { selections, setSelection }: any = useContext(SelectionContext);
+    const { selections, setSelection, setMetadata, metadata }: any = useContext(
+      SelectionContext
+    );
     const selected = selections[firestoreKey] || {};
     const updateMatchesInDb = async (optionCopy) => {
       const mediaCollection = await firestore.collection("media");
       const matchFields = mediaCollection.doc(optionCopy?.id);
-
+      const {
+        user: { avatar = "", fullName = "" },
+      } = metadata;
       matchFields.get().then((doc) => {
+        console.log("metadata", metadata);
         if (!doc.exists) {
           // add match document if it doesnt exist already
           mediaCollection.doc(optionCopy?.id).set({
             title: optionCopy?.value?.title,
-            currentlySelectedBy: [{ id: user.uid, email: user.email }],
+            currentlySelectedBy: [
+              { id: user.uid, email: user.email, avatar, fullName },
+            ],
           });
         } else {
           // otherwise append current uid to collection
           matchFields.update({
             currentlySelectedBy: [
               ...doc.data()!.currentlySelectedBy,
-              { id: user.uid, email: user.email },
+              { id: user.uid, email: user.email, avatar, fullName },
             ],
           });
         }
@@ -213,7 +220,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
         const lowResImageUrl = additionalResponse[0].url;
         const highResImageUrl = lowResImageUrl.replace("t_thumb", "t_original");
         const imageUrl = `https:${highResImageUrl}`;
-        console.log("imageUrl", imageUrl);
         optionCopy.value.image = imageUrl;
       }
       console.log("optionCopy", optionCopy);
@@ -233,7 +239,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     const handleOnFocus = (_) => console.log("onFocus");
 
     const handleLoadOptions = (inputValue: string, callback) => {
-      console.log("inputValue", inputValue);
       if (!inputValue) return callback([]);
       return callCloudFn(inputValue, callback);
     };
@@ -272,7 +277,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
 
     const callCloudFn = async (maybeInput: string, callback) => {
       try {
-        console.log("maybeInput", maybeInput);
         // custom format data if necessary
         const postData = dataFormatter ? dataFormatter(maybeInput) : data;
         // add parameters to API url if necessary
@@ -333,14 +337,16 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     const handleClear = async () => {
       const userFields = await firestore.collection("users").doc(user.uid);
       console.log("selected", selected);
-      const matchFields = await firestore
-        .collection("media")
-        .doc(selected?.value?.id);
+      const matchFields = await firestore.collection("media").doc(selected?.id);
       //remove uid from media collection
-      matchFields.get().then((r) => {
-        if (!r.exists) return;
-        const oldArr = r.data()!.currentlySelectedBy;
+      matchFields.get().then((doc) => {
+        console.log("doc", doc);
+        if (!doc.exists) return;
+        console.log("doc.data()", doc.data());
+        const oldArr = doc.data()!.currentlySelectedBy;
+        console.log("oldArr", oldArr);
         const newArr = oldArr.filter(({ id }) => id !== user.uid);
+        console.log("newArr", newArr);
         matchFields.update({
           currentlySelectedBy: newArr,
         });
@@ -353,23 +359,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     };
 
     useEffect(() => {
-      console.log("selections", selections);
-    });
-
-    useEffect(() => {
-      if (user?.uid) {
-        const listener = firebase
-          .firestore()
-          .collection("users")
-          .doc(user?.uid)
-          .onSnapshot((doc) => {
-            const source = doc.metadata.hasPendingWrites;
-            const selected = doc.data() && doc.data()![firestoreKey]; // TS needs ! to know data() is guaranteed to be method of doc
-            return setSelection({ [firestoreKey]: selected });
-          });
-        // unsubscribe listener
-        return () => listener();
-      }
       if (publicUserId) {
         const publicUserRes = firebase
           .firestore()
@@ -377,9 +366,33 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
           .doc(publicUserId)
           .get()
           .then((doc) => {
+            if (isEmpty(metadata.publicUser) && doc.data()) {
+              const {
+                metadata: { avatar, fullName },
+              } = doc.data()!;
+              setMetadata({ publicUser: { fullName, avatar } });
+            }
             const selected = doc.data() && doc.data()![firestoreKey];
             return setSelection({ [firestoreKey]: selected });
           });
+      } else if (user?.uid) {
+        const listener = firebase
+          .firestore()
+          .collection("users")
+          .doc(user?.uid)
+          .onSnapshot((doc) => {
+            console.log("doc", doc.data());
+            if (isEmpty(metadata.user) && doc.data()) {
+              const {
+                metadata: { avatar, fullName },
+              } = doc.data()!;
+              setMetadata({ user: { fullName, avatar } });
+            }
+            const selected = doc.data() && doc.data()![firestoreKey];
+            return setSelection({ [firestoreKey]: selected });
+          });
+        // unsubscribe listener
+        return () => listener();
       }
     }, [firestoreKey, user, publicUserId]);
     return (

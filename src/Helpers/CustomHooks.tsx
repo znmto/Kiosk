@@ -44,10 +44,16 @@ export const SelectionContextProvider = ({ children }) => {
     game: {},
     book: {},
   });
+  const [metadata, setMetadata] = useReducer(reducer, {
+    user: {},
+    publicUser: {},
+  });
 
   return (
     <>
-      <SelectionContext.Provider value={{ selections, setSelection }}>
+      <SelectionContext.Provider
+        value={{ selections, setSelection, metadata, setMetadata }}
+      >
         {children}
       </SelectionContext.Provider>
     </>

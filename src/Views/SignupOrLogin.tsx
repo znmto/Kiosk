@@ -150,50 +150,52 @@ const SignupOrLogin = (props) => {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-          <StyledSampleLoginsCard variant="outlined">
-            <CardContent>
-              <Typography variant="h5" align="center">
-                Sample Logins
-              </Typography>
-              <Typography variant="body2" align="center">
-                (click to prefill form)
-              </Typography>
-              <List component="nav" aria-label="main mailbox folders">
-                <ListItem
-                  button
-                  onClick={() => {
-                    setEmail("test1@test.com");
-                    setPassword("test123");
-                  }}
-                >
-                  <ListItemIcon>
-                    {email === "test1@test.com" ? (
-                      <LockIcon htmlColor={theme.palette.success.main} />
-                    ) : (
-                      <LockOpenIcon />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText primary="test1@test.com / test123" />
-                </ListItem>
-                <ListItem
-                  button
-                  onClick={() => {
-                    setEmail("test1@example.com");
-                    setPassword("test123");
-                  }}
-                >
-                  <ListItemIcon>
-                    {email === "test1@example.com" ? (
-                      <LockIcon htmlColor={theme.palette.success.main} />
-                    ) : (
-                      <LockOpenIcon />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText primary="test1@example.com / test123" />
-                </ListItem>
-              </List>
-            </CardContent>
-          </StyledSampleLoginsCard>
+          {!isSignup && (
+            <StyledSampleLoginsCard variant="outlined">
+              <CardContent>
+                <Typography variant="h5" align="center">
+                  Sample Logins
+                </Typography>
+                <Typography variant="body2" align="center">
+                  (click to prefill form)
+                </Typography>
+                <List component="nav" aria-label="main mailbox folders">
+                  <ListItem
+                    button
+                    onClick={() => {
+                      setEmail("test@example.com");
+                      setPassword("test123");
+                    }}
+                  >
+                    <ListItemIcon>
+                      {email === "test@example.com" ? (
+                        <LockIcon htmlColor={theme.palette.success.main} />
+                      ) : (
+                        <LockOpenIcon />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText primary="test@example.com / test123" />
+                  </ListItem>
+                  <ListItem
+                    button
+                    onClick={() => {
+                      setEmail("test1@example.com");
+                      setPassword("test123");
+                    }}
+                  >
+                    <ListItemIcon>
+                      {email === "test1@example.com" ? (
+                        <LockIcon htmlColor={theme.palette.success.main} />
+                      ) : (
+                        <LockOpenIcon />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText primary="test1@example.com / test123" />
+                  </ListItem>
+                </List>
+              </CardContent>
+            </StyledSampleLoginsCard>
+          )}
           <Typography component="h1" variant="h5">
             {labelsMap["title"]}
           </Typography>
