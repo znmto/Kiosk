@@ -51,10 +51,12 @@ app.post("/addFriend", (req, res) => {
   getUser
     .then(({ uid }) => (user.uid = uid))
     .then(async something => {
+      // TODO: fix this noob code
       console.log("something", something);
       const fields = await admin.firestore.collection("users").doc(currentUserUid);
       const existingFriends = fields.friends;
       const updatedFriends = existingFriends.concat(user);
+      // TODO: fix this noob code
       await fields.update({
         friends: updatedFriends,
       });

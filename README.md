@@ -4,7 +4,7 @@
 
 ### `Architecture`
 
-<img src="kiosk.png" alt="Kitten"
+<img src="kiosk.png" alt="Kiosk"
 	title="Kiosk Architecture"/>
 
 ### `Purpose`
@@ -22,11 +22,12 @@ Firestore expedites development by providing tooling for the database layer and 
 
 ### `To Do`
 
-1. Implement feed to view friends' activity.
+1. Refactor hacky code.
 2. ~~Implement shareable link for unauthenticated activity sharing.~~
-3. Add Types where missing.
-4. Set up prod credentials/api keys.
-5. UI/UX work.
+3. Add Types where missing/broken.
+4. Set up PROD credentials/api keys.
+5. Finish UI/UX.
 6. ~~Local development walkthrough.~~
+7. Implement friends and feed functionality.
 
 ### Created using [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), and [Google Firebase](https://firebase.google.com/).
