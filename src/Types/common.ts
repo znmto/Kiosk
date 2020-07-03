@@ -6,3 +6,11 @@ export type AdditionalRequest = {
   headers: any;
   data?: any;
 };
+
+export type MatchesParams = {
+  showOnly?: string;
+};
+
+export type PublicViewParam = {
+  publicUid?: string;
+};

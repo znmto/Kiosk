@@ -15,30 +15,24 @@ import {
   ACTIVITY,
   FRIENDS,
   MATCHES,
+  MATCHES_FILTER,
   PUBLIC_ACTIVITY,
 } from "../Constants/routes";
 import { useTheme, Theme } from "@material-ui/core/styles";
 import { BottomNavigationProps } from "@material-ui/core/BottomNavigation";
 import { User } from "firebase";
 import { useSession } from "../Helpers/CustomHooks";
+import { MatchesParams, PublicViewParam } from "../Types/common";
 
-type ExtraProps = {
+type BottomNavProps = {
   secondary?: any; //TODO: fix type
 };
-
-// type MatchParams = {
-//   params: Params;
-// };
-
-// type Params = {
-//   publicUid: string;
-// };
 
 const StyledBottomNavigation = styled(BottomNavigation)`
   width: 100%;
   position: fixed;
   bottom: 0;
-  border-top: 1px solid ${(props: ExtraProps) => props.secondary};
+  border-top: 1px solid ${(props: BottomNavProps) => props.secondary};
   z-index: 2;
   grid-template-columns: 1fr 1fr 1fr;
   display: grid;
@@ -46,18 +40,18 @@ const StyledBottomNavigation = styled(BottomNavigation)`
   height: 55px;
 ` as any;
 
-const BottomNav: React.FC = (props) => {
-  let location = useLocation();
-  let history = useHistory();
-  let { params: { publicUid = "" } = {} } =
-    (useRouteMatch({
-      path: PUBLIC_ACTIVITY,
+const BottomNav: React.FC<BottomNavProps> = (props: BottomNavProps) => {
+  const location = useLocation();
+  const history = useHistory();
+  const { params: { publicUid = "", showOnly = "" } = {} } =
+    (useRouteMatch<MatchesParams | PublicViewParam>({
+      path: [PUBLIC_ACTIVITY, MATCHES_FILTER],
       exact: true,
       strict: true,
     }) as any) || {}; // TODO: react-router exposed types incorrect
 
   // default view
-  const [route, setRoute] = React.useState(location?.pathname);
+  const [route, setRoute] = React.useState<string>(location?.pathname);
 
   console.log("location", location);
   const theme: Theme = useTheme();
@@ -66,14 +60,8 @@ const BottomNav: React.FC = (props) => {
   const navigate = (route: string): void => history.push(route);
 
   useEffect(() => {
-    console.log("location", location);
-    console.log("history", history);
-    console.log("match", publicUid);
-    console.log("route", route);
-    // user.whatever = 1;
-    console.log("user", user);
     setRoute(location?.pathname);
-  }, [location, history, publicUid]);
+  }, [location, publicUid]);
 
   return user ? (
     <StyledBottomNavigation
@@ -81,24 +69,27 @@ const BottomNav: React.FC = (props) => {
       showLabels
       secondary={theme.palette.secondary.main}
     >
-      {/* <BottomNavigationAction
-        onClick={(e) => navigate(HOME)}
-        label="Home"
-        value="/home"
-        icon={<Home />}
-      /> */}
       <BottomNavigationAction
         onClick={(e) => navigate(ACTIVITY)}
         label="My Activity"
         value="/activity"
         icon={<Favorite />}
       />
-      <BottomNavigationAction
-        onClick={(e) => navigate(MATCHES)}
-        label="Matches"
-        value="/matches"
-        icon={<Announcement />}
-      />
+      {showOnly ? (
+        <BottomNavigationAction
+          onClick={(e) => navigate(MATCHES)}
+          label="Matches"
+          value={`/matches/${showOnly}`}
+          icon={<Announcement />}
+        />
+      ) : (
+        <BottomNavigationAction
+          onClick={(e) => navigate(MATCHES)}
+          label="Matches"
+          value="/matches"
+          icon={<Announcement />}
+        />
+      )}
       {publicUid && (
         <BottomNavigationAction
           onClick={() => {}}

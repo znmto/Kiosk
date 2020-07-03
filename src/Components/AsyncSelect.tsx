@@ -1,6 +1,6 @@
 import "isomorphic-fetch";
 import axios from "axios";
-import React, { useEffect, memo, useContext } from "react";
+import React, { useEffect, memo, useContext, ReactElement } from "react";
 import AsyncSelect from "react-select/async";
 import styled from "styled-components";
 import debounce from "debounce-promise";
@@ -11,13 +11,14 @@ import { useTheme, Theme } from "@material-ui/core/styles";
 import firebase from "../FirebaseConfig";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
 import { Typography, LinearProgress, Link } from "@material-ui/core";
+import Rating from "@material-ui/lab/Rating";
 import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import Tooltip from "@material-ui/core/Tooltip";
 import { User } from "firebase";
 import { AdditionalRequest } from "../Types/common";
 import { useHistory } from "react-router-dom";
-import { AssignmentReturnRounded } from "@material-ui/icons";
+import { TV_SHOW, MOVIE, GAME, BOOK } from "../Constants/media";
 
 type StyleProps = {
   // x,y location of section in view
@@ -31,11 +32,11 @@ const StyledMediaSelectorWrapper = styled.div`
   display: grid;
   grid-column: ${({ quadrant = [] }: StyleProps) => quadrant[0]};
   grid-row: ${({ quadrant = [] }: StyleProps) => quadrant[1]};
-  height: calc((100vh - 350px) / 2);
+  height: calc((100vh - 320px) / 2);
   align-content: center;
   justify-content: center;
   img {
-    max-width: 225px;
+    max-width: 200px;
     margin: 0 auto;
   }
 `;
@@ -79,7 +80,10 @@ const StyledDescriptionContainer = styled.div`
 
 const StyledActionIconsContainer = styled.div`
   display: grid;
-  justify-content: space-evenly;
+  justify-content: center;
+  > div {
+    margin: 0 10px;
+  }
 `;
 
 const StlyedActionIcon = styled.div`
@@ -212,15 +216,34 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
         id: `${firestoreKey}-${selectedOption?.value?.id}`,
       });
       // if we need to make a 2nd call to augment the user selection, do it on change
-      // very igdb api specific
+      // api specific
       if (!isEmpty(additionalRequest)) {
-        const additionalResponse = await augmentWithAdditionalRequest(
-          optionCopy?.value[additionalRequest!.matchFieldName]
-        );
-        const lowResImageUrl = additionalResponse[0].url;
-        const highResImageUrl = lowResImageUrl.replace("t_thumb", "t_original");
-        const imageUrl = `https:${highResImageUrl}`;
-        optionCopy.value.image = imageUrl;
+        const {
+          url: additionalRequestUrl,
+          matchFieldName,
+        } = additionalRequest!;
+        if (firestoreKey === GAME) {
+          const additionalResponse = await augmentWithAdditionalRequest({
+            customUrl: additionalRequestUrl,
+            customBody: `where id = ${optionCopy?.value[matchFieldName]}; fields *;`,
+          });
+          const lowResImageUrl = additionalResponse[0].url;
+          const highResImageUrl = lowResImageUrl.replace(
+            "t_thumb",
+            "t_original"
+          );
+          const imageUrl = `https:${highResImageUrl}`;
+          optionCopy.value.image = imageUrl;
+        }
+        if ([MOVIE, TV_SHOW].includes(firestoreKey)) {
+          const additionalResponse = await augmentWithAdditionalRequest({
+            customUrl: `${additionalRequestUrl}&i=${optionCopy?.value[matchFieldName]}`,
+          });
+          const normalizedRating =
+            parseFloat(additionalResponse?.imdbRating) / 2;
+          optionCopy.value.rating = normalizedRating;
+          console.log("additionalResponse", additionalResponse);
+        }
       }
       console.log("optionCopy", optionCopy);
       // get user data from DB
@@ -243,14 +266,15 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       return callCloudFn(inputValue, callback);
     };
 
-    const augmentWithAdditionalRequest = async (matchFieldName) => {
-      const {
-        url,
-        data,
-        method,
-        headers,
-        description,
-      } = props.additionalRequest!;
+    const augmentWithAdditionalRequest = async ({
+      customBody = {},
+      customUrl,
+    }: {
+      customBody?: any;
+      customUrl: string;
+    }) => {
+      const { method, headers, description } = props.additionalRequest!;
+      console.log("customBody, customUrl", customBody, customUrl);
       window.console.log(`additional request initated to ${description}`);
       try {
         const { data: response } = await axios({
@@ -261,9 +285,8 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
             "Access-Control-Allow-Origin": "*",
           },
           data: {
-            url,
-            body: `where id = ${matchFieldName}; fields *;`,
-            // body: data,
+            url: customUrl,
+            ...(!isEmpty(customBody) ? { body: customBody } : {}),
             method,
             headers,
           },
@@ -271,7 +294,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
         console.log("additional response", response);
         return response;
       } catch (error) {
-        throw new Error(error);
+        console.log("error", error);
       }
     };
 
@@ -306,19 +329,20 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       }
     };
 
-    const getImage = () => {
+    const getImage = (): ReactElement => {
       const { value: { image = "" } = {} } = selected;
       if (!isEmpty(selected)) return <img alt="media-cover" src={image} />;
       return <></>;
     };
 
-    const getDecription = () => {
-      const { value: { title = "", subtitle = "", id = "" } = {} } = selected;
+    const getDecription = (): ReactElement => {
+      const {
+        value: { title = "", subtitle = "", id = "", rating = null } = {},
+      } = selected;
       if (!isEmpty(selected)) {
         return (
           <StyledDescriptionContainer>
-            <Typography component="h1" variant="h4">
-              {/* TODO: change this to open recommendations */}
+            <Typography variant="h5">
               <Link
                 style={{ cursor: "pointer" }}
                 onClick={() => history.push(`matches/${firestoreKey}`)}
@@ -326,12 +350,23 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
                 {title}
               </Link>
             </Typography>
-            <Typography component="h1" variant="h5">
-              {subtitle}
-            </Typography>
+            <Typography variant="h6">{subtitle}</Typography>
+            {rating && (
+              <>
+                <Rating
+                  name="read-only"
+                  value={rating}
+                  precision={0.1}
+                  size="large"
+                  readOnly
+                />
+                <Typography>{rating} / 5</Typography>
+              </>
+            )}
           </StyledDescriptionContainer>
         );
       }
+      return <></>;
     };
 
     const handleClear = async () => {

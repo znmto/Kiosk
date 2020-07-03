@@ -9,7 +9,7 @@ import SignupOrLogin from "./Views/SignupOrLogin";
 import Profile from "./Views/Profile";
 import Home from "./Views/Home";
 import Activity from "./Views/Activity";
-// import Friends from "./Views/Friends";
+import { useTheme, Theme } from "@material-ui/core/styles";
 import Layout from "./Views/Layout";
 import Matches from "./Views/Matches";
 import {
@@ -31,15 +31,23 @@ import { UserCredential } from "firebase/firebase-auth";
 import { CircularProgress, Grid } from "@material-ui/core";
 
 const App: React.FC = () => {
+  const theme: Theme = useTheme();
+
   const {
     initializing,
     user,
   }: { initializing: boolean; user: UserCredential } = useAuth();
-  // const fields: any = useSnapshot(user);
   if (initializing) {
     return (
-      <Grid container justify="center">
-        <CircularProgress />
+      <Grid
+        style={{ height: "100vh" }}
+        container
+        justify="center"
+        alignItems="center"
+      >
+        <Grid item>
+          <CircularProgress style={{ color: "#325247" }} size={100} />
+        </Grid>
       </Grid>
     );
   }

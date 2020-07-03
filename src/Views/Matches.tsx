@@ -8,14 +8,21 @@ import { media, Media } from "../Constants/media";
 import isEmpty from "lodash/isEmpty";
 import { useParams } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
+import Link from "@material-ui/core/Link";
+import { MatchesParams } from "../Types/common";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  matchesMediaThumbnail: { width: 150, borderRadius: 6 },
+  matchesMediaThumbnail: {
+    width: "200px",
+    borderRadius: "6px",
+    display: "block",
+    margin: "15px auto",
+  },
   matchesWrapper: {
-    padding: 50,
+    padding: "50px",
   },
   mediaIconWrapper: {
-    fontSize: 36,
+    fontSize: "36px",
     color: theme.palette.primary.main,
     textAlign: "center",
   },
@@ -25,17 +32,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   hidden: {
     display: "none",
   },
+  avatar: {
+    margin: "5px 15px",
+    display: "inline-block",
+  },
 }));
-
-type MatchesParams = {
-  showOnly?: string;
-};
 
 const Matches: React.FC = (props) => {
   const classes = useStyles();
   const user: User = useSession();
   const params = useParams<MatchesParams>();
-  console.log("params", params);
   const { selections, _ }: any = useContext(SelectionContext);
 
   const reducer = (state, payload) => ({ ...state, ...payload });
@@ -44,10 +50,8 @@ const Matches: React.FC = (props) => {
   });
 
   useEffect(() => {
-    console.log("Object.entries(selections)", Object.values(selections));
     if (user?.uid && !isEmpty(selections.game)) {
       const getSetUsersThatHaveSelected = () => {
-        console.log("selections", selections);
         Promise.all(
           media.map((k) => {
             if (isEmpty(selections[k.firestoreKey])) return false;
@@ -79,8 +83,8 @@ const Matches: React.FC = (props) => {
       {media.map((m: Media) => {
         return (
           <Grid
-            key={m.firestoreKey}
             item
+            key={m.firestoreKey}
             className={
               !isEmpty(params) &&
               params.showOnly !== m.firestoreKey &&
@@ -94,26 +98,28 @@ const Matches: React.FC = (props) => {
                 alt="media-thumbnail"
                 src={selections[m.firestoreKey]?.value?.image}
               />
-              {state.usersThatHaveSelected[m.firestoreKey]?.map(
-                ({ id, email, avatar, fullName }) => {
-                  return (
-                    <div>
-                      <Avatar
-                        style={{ margin: "0 15px" }}
-                        alt={email}
-                        src={avatar}
-                      />
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`${window.location.origin}/activity/${id}`}
-                      >
-                        {email}
-                      </a>
-                    </div>
-                  );
-                }
-              )}
+              <Grid container justify="center" direction="column">
+                {state.usersThatHaveSelected[m.firestoreKey]?.map(
+                  ({ id, email, avatar, fullName }) => {
+                    return (
+                      <Grid container item alignItems="center">
+                        <Avatar
+                          className={classes.avatar}
+                          alt={email}
+                          src={avatar}
+                        />
+                        <Link
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={`${window.location.origin}/activity/${id}`}
+                        >
+                          {email}
+                        </Link>
+                      </Grid>
+                    );
+                  }
+                )}
+              </Grid>
             </Paper>
           </Grid>
         );

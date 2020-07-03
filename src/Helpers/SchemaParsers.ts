@@ -12,6 +12,7 @@ export const omdbSchemaParser = (apiResponse: OMDBMovieArr) => {
       Poster: image = "",
       imdbID: id = "",
       Type: type = "",
+      imdbRating = "",
     }) => ({
       label: `${title} (${subtitle})`,
       value: {
@@ -20,6 +21,7 @@ export const omdbSchemaParser = (apiResponse: OMDBMovieArr) => {
         subtitle,
         image,
         type,
+        rating: parseFloat(imdbRating),
       },
     })
   );
@@ -36,6 +38,7 @@ export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
         imageLinks: { thumbnail: image } = {},
         industryIdentifiers = [],
         publishedDate = "",
+        averageRating = null,
       },
     }) => ({
       label: `${title} (${authors?.[0]})`,
@@ -48,6 +51,7 @@ export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
         subtitle: `${authors?.[0]}, ${publishedDate?.slice(0, 4)}`,
         image,
         type: "book",
+        rating: averageRating,
       },
     })
   );
@@ -56,7 +60,7 @@ export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
 export const igdbSchemaParser = (apiResponse: IGDBGameArr) => {
   console.log("apiResponse", apiResponse);
   return apiResponse.map(
-    ({ id, name: title, first_release_date = 0, cover, url }) => ({
+    ({ id, name: title, first_release_date = 0, cover, url, rating }) => ({
       label: `${title}`,
       value: {
         id,
@@ -65,6 +69,7 @@ export const igdbSchemaParser = (apiResponse: IGDBGameArr) => {
         cover,
         type: "game",
         url,
+        rating: rating ? (rating / 20).toFixed(1) : null,
       },
     })
   );

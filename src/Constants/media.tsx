@@ -13,6 +13,11 @@ import {
 import { IconBaseProps } from "react-icons/lib";
 import { AdditionalRequest } from "../Types/common";
 
+export const MOVIE = "movie";
+export const TV_SHOW = "tvShow";
+export const GAME = "game";
+export const BOOK = "book";
+
 export type Media = {
   label: string;
   icon: ReactElement;
@@ -28,19 +33,30 @@ export type Media = {
   externalUrlFormatter: (arg1: any) => string;
 };
 
+const omdbAdditionalRequest = {
+  description: "fetch rating",
+  matchFieldName: "id",
+  url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}`,
+  method: "GET",
+  headers: {
+    Accept: "application/json",
+  },
+};
+
 export const media: Media[] = [
   {
     label: "Movie",
     icon: <MdLocalMovies />,
     quadrant: [1, 1],
-    url: "http://www.omdbapi.com/?apikey=3b953286",
+    url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&type=movie`,
     method: "GET",
     headers: {
       Accept: "application/json",
     },
     searchParam: "s",
     schemaParser: omdbSchemaParser,
-    firestoreKey: "movie",
+    firestoreKey: MOVIE,
+    additionalRequest: omdbAdditionalRequest,
     externalUrlFormatter: (interpolatable): string =>
       `https://imdb.com/title/${interpolatable?.value?.id}`,
   },
@@ -48,14 +64,15 @@ export const media: Media[] = [
     label: "TV Show",
     icon: <MdLiveTv />,
     quadrant: [2, 1],
-    url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}`,
+    url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&type=series`,
     method: "GET",
     headers: {
       Accept: "application/json",
     },
     searchParam: "s",
     schemaParser: omdbSchemaParser,
-    firestoreKey: "tvShow",
+    firestoreKey: TV_SHOW,
+    additionalRequest: omdbAdditionalRequest,
     externalUrlFormatter: (interpolatable): string =>
       `https://imdb.com/title/${interpolatable?.value?.id}`,
   },
@@ -70,7 +87,7 @@ export const media: Media[] = [
     },
     searchParam: "q",
     schemaParser: googleBooksSchemaParser,
-    firestoreKey: "book",
+    firestoreKey: BOOK,
     externalUrlFormatter: (interpolatable): string => {
       const isbn = interpolatable?.value?.isbn13;
       // AMAZON REFERRAL
@@ -89,7 +106,7 @@ export const media: Media[] = [
       Accept: "application/json",
     },
     schemaParser: igdbSchemaParser,
-    firestoreKey: "game",
+    firestoreKey: GAME,
     dataFormatter: (interpolatable: string): string => {
       const prefix: string = "search ";
       const postfix: string = " fields *;";
