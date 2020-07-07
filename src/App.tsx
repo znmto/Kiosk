@@ -25,7 +25,7 @@ import {
 import {
   useAuth,
   UserContext,
-  SelectionContextProvider,
+  FirestoreContextProvider,
 } from "./Helpers/CustomHooks";
 import { UserCredential } from "firebase/firebase-auth";
 import { CircularProgress, Grid } from "@material-ui/core";
@@ -53,7 +53,7 @@ const App: React.FC = () => {
   }
   return (
     <UserContext.Provider value={{ user }}>
-      <SelectionContextProvider>
+      <FirestoreContextProvider>
         <Router>
           <Layout>
             <Switch>
@@ -72,7 +72,7 @@ const App: React.FC = () => {
             </Switch>
           </Layout>
         </Router>
-      </SelectionContextProvider>
+      </FirestoreContextProvider>
     </UserContext.Provider>
   );
 };

@@ -365,33 +365,31 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
           </StyledDescriptionContainer>
         );
       }
-      return (
-        <Grid container direction="column" alignItems="center">
-          <Grid item>
-            <Typography variant="h5">{`Search for a ${label} below`}</Typography>
-          </Grid>
-          <Grow in style={{ transformOrigin: "0 0 0" }} timeout={3000}>
+      if (!publicUserId) {
+        return (
+          <Grid container direction="column" alignItems="center">
             <Grid item>
-              <StyledArrowDownwardIcon primary={theme.palette.primary.main} />
+              <Typography variant="h5">{`Search for a ${label} below`}</Typography>
             </Grid>
-          </Grow>
-        </Grid>
-      );
+            <Grow in style={{ transformOrigin: "0 0 0" }} timeout={3000}>
+              <Grid item>
+                <StyledArrowDownwardIcon primary={theme.palette.primary.main} />
+              </Grid>
+            </Grow>
+          </Grid>
+        );
+      }
+      return <></>;
     };
 
     const handleClear = async () => {
       const userFields = await firestore.collection("users").doc(user.uid);
-      console.log("selected", selected);
       const matchFields = await firestore.collection("media").doc(selected?.id);
       //remove uid from media collection
       matchFields.get().then((doc) => {
-        console.log("doc", doc);
         if (!doc.exists) return;
-        console.log("doc.data()", doc.data());
         const oldArr = doc.data()!.currentlySelectedBy;
-        console.log("oldArr", oldArr);
         const newArr = oldArr.filter(({ id }) => id !== user.uid);
-        console.log("newArr", newArr);
         matchFields.update({
           currentlySelectedBy: newArr,
         });
@@ -474,7 +472,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
         </StyledActionIconsContainer>
         {getImage()}
         {getDecription()}
-        {isEmpty(selected) && (
+        {isEmpty(selected) && !publicUserId && (
           <StyledAsyncSelectWrapper>
             <AsyncSelect
               value={selected}

@@ -9,7 +9,6 @@ import firebase from "../FirebaseConfig";
 import { User } from "firebase";
 
 export const UserContext = createContext({ user: {} as User });
-export const FirestoreContext = createContext({ document: {} });
 export const SelectionContext = createContext({});
 
 export const useSession = () => {
@@ -36,15 +35,58 @@ export const useAuth = () => {
   return state;
 };
 
-export const SelectionContextProvider = ({ children }) => {
-  const reducer = (state, payload) => ({ ...state, ...payload });
-  const [selections, setSelection] = useReducer(reducer, {
+type ContextMedia = {
+  id: string;
+  label: string;
+  value: ContextMediaValue;
+};
+
+type ContextMediaValue = {
+  title: string;
+  rating: number;
+  id: string;
+  type: string;
+  subtitle: string;
+  image: string;
+};
+
+type FirestoreContextUser = {
+  fullName?: string;
+  avatar?: string;
+  email?: string;
+};
+type FirestoreContextMedatata = {
+  publicUser?: FirestoreContextUser;
+  user?: FirestoreContextUser;
+};
+
+type FirestoreContextSelections = {
+  movie?: ContextMedia;
+  tvShow?: ContextMedia;
+  game?: ContextMedia;
+  book?: ContextMedia;
+};
+
+type FirestoreContextState = {
+  selections?: FirestoreContextSelections;
+  metadata?: FirestoreContextMedatata;
+};
+
+export const FirestoreContextProvider = ({ children }) => {
+  const reducer = (
+    state: FirestoreContextState,
+    payload: FirestoreContextSelections & FirestoreContextMedatata
+  ) => ({
+    ...state,
+    ...payload,
+  });
+  const [selections, setSelection] = useReducer<any>(reducer, {
     movie: {},
     tvShow: {},
     game: {},
     book: {},
   });
-  const [metadata, setMetadata] = useReducer(reducer, {
+  const [metadata, setMetadata] = useReducer<any>(reducer, {
     user: {},
     publicUser: {},
   });

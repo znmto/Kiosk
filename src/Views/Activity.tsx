@@ -61,6 +61,7 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const classes = useStyles();
   const history = useHistory();
   const { metadata }: any = useContext(SelectionContext);
+  console.log("metadata", metadata);
 
   const getUserNamesById = async (userIdArr: string[]) => {
     const userIdParam = userIdArr.join(",");
