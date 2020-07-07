@@ -34,11 +34,20 @@ const ClipBoardCopy = memo(() => {
   const [state, dispatch] = useReducer(reducer, {
     value: `${window.location.origin}/activity/${user?.uid}`,
     copied: false,
-    showTooltip: false,
   });
 
   return (
-    <div>
+    <Tooltip
+      // open
+
+      PopperProps={{}}
+      arrow
+      placement="bottom"
+      open={state.copied}
+      title={"Copied to clipboard!"}
+      leaveDelay={1500}
+      // onClose={() => dispatch({ showTooltip: false })}
+    >
       <TextField
         label="Shareable Link"
         variant="outlined"
@@ -49,34 +58,28 @@ const ClipBoardCopy = memo(() => {
             padding: 10,
           },
           endAdornment: (
-            <InputAdornment position="end">
-              <Tooltip
-                // open
-                open={state.copied}
-                title={"Copied to clipboard!"}
-                leaveDelay={1500}
-                onClose={() => dispatch({ showTooltip: false })}
-              >
-                <CopyToClipboard
-                  text={state.value}
-                  onCopy={() => dispatch({ copied: true, showTooltip: true })}
-                >
-                  {!state.copied ? (
-                    <StyledAssignmentOutlinedIcon
-                      secondary={theme.palette.secondary.main}
-                    />
-                  ) : (
-                    <StyledAssignmentTurnedInOutlinedIcon
-                      primary={theme.palette.primary.main}
-                    />
-                  )}
-                </CopyToClipboard>
-              </Tooltip>
-            </InputAdornment>
+            // <InputAdornment position="end">
+
+            <CopyToClipboard
+              text={state.value}
+              onCopy={() => dispatch({ copied: true })}
+            >
+              {!state.copied ? (
+                <StyledAssignmentOutlinedIcon
+                  secondary={theme.palette.secondary.main}
+                />
+              ) : (
+                <StyledAssignmentTurnedInOutlinedIcon
+                  primary={theme.palette.primary.main}
+                />
+              )}
+            </CopyToClipboard>
+
+            // </InputAdornment>
           ),
         }}
-      />{" "}
-    </div>
+      />
+    </Tooltip>
   );
 });
 export default ClipBoardCopy;

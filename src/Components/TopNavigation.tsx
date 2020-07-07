@@ -10,7 +10,7 @@ import { LOGIN } from "../Constants/routes";
 import firebase from "../FirebaseConfig";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
 import { useTheme } from "@material-ui/core/styles";
-import logo from "../logo.png";
+import logo from "../images/logo.png";
 import { User } from "firebase";
 import isEmpty from "lodash/isEmpty";
 

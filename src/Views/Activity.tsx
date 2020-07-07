@@ -8,12 +8,14 @@ import { useSession } from "../Helpers/CustomHooks";
 import { FIREBASE_GET_ID_URL } from "../Constants/api";
 import { User } from "firebase";
 import ClipBoardCopy from "../Components/CopyToClipboard";
-import { media, Media } from "../Constants/media";
+import { media } from "../Constants/media";
 import { LOGIN } from "../Constants/routes";
 import Avatar from "@material-ui/core/Avatar";
 import { SelectionContext } from "../Helpers/CustomHooks";
 import { useHistory } from "react-router-dom";
 import { Typography, Grid } from "@material-ui/core";
+import { Share } from "@material-ui/icons";
+import { Media } from "../Types/common";
 
 type StyleProps = {
   color?: string;
@@ -37,6 +39,11 @@ const useStyles = makeStyles((theme: Theme) => ({
       width: "300px",
       padding: "5px",
     },
+  },
+  shareIcon: {
+    fontSize: "28px !important",
+    color: theme.palette.primary.main,
+    margin: "10px 15px 0px 0px",
   },
 }));
 
@@ -86,6 +93,7 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
           container
           justify="center"
         >
+          <Share className={classes.shareIcon} />
           <ClipBoardCopy />
         </Grid>
       ) : (

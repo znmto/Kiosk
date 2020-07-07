@@ -1,15 +1,15 @@
 import React, { useReducer, useEffect, useContext } from "react";
-import { Grid, makeStyles, Theme, Paper } from "@material-ui/core";
-import styled from "styled-components";
+import { Grid, makeStyles, Theme, Paper, Typography } from "@material-ui/core";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
 import firebase from "../FirebaseConfig";
 import { User } from "firebase";
-import { media, Media } from "../Constants/media";
+import { media } from "../Constants/media";
 import isEmpty from "lodash/isEmpty";
 import { useParams } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Link from "@material-ui/core/Link";
 import { MatchesParams } from "../Types/common";
+import { Media } from "../Types/common";
 
 const useStyles = makeStyles((theme: Theme) => ({
   matchesMediaThumbnail: {
@@ -22,7 +22,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: "50px",
   },
   mediaIconWrapper: {
-    fontSize: "36px",
+    "& svg": {
+      fontSize: "32px",
+    },
     color: theme.palette.primary.main,
     textAlign: "center",
   },
@@ -35,6 +37,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
     margin: "5px 15px",
     display: "inline-block",
+  },
+  noMediaMatches: {
+    maxWidth: 300,
+    textAlign: "center",
   },
 }));
 
@@ -81,6 +87,7 @@ const Matches: React.FC = (props) => {
       justify={!isEmpty(params) ? "center" : "space-between"}
     >
       {media.map((m: Media) => {
+        const mediaMatches = state.usersThatHaveSelected[m.firestoreKey];
         return (
           <Grid
             item
@@ -95,12 +102,12 @@ const Matches: React.FC = (props) => {
               <div className={classes.mediaIconWrapper}>{m.icon}</div>
               <img
                 className={classes.matchesMediaThumbnail}
-                alt="media-thumbnail"
+                alt=""
                 src={selections[m.firestoreKey]?.value?.image}
               />
               <Grid container justify="center" direction="column">
-                {state.usersThatHaveSelected[m.firestoreKey]?.map(
-                  ({ id, email, avatar, fullName }) => {
+                {mediaMatches ? (
+                  mediaMatches.map(({ id, email, avatar, fullName }) => {
                     return (
                       <Grid container item alignItems="center">
                         <Avatar
@@ -117,7 +124,15 @@ const Matches: React.FC = (props) => {
                         </Link>
                       </Grid>
                     );
-                  }
+                  })
+                ) : (
+                  <>
+                    <Typography className={classes.noMediaMatches} variant="h6">
+                      {`Select a ${m.label} in the `}
+                      <Link href="/activity">Activity </Link>
+                      tab to see recommendations
+                    </Typography>
+                  </>
                 )}
               </Grid>
             </Paper>

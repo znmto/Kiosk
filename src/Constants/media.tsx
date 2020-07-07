@@ -1,37 +1,19 @@
-import React, { ReactHTMLElement, ReactNode, ReactElement } from "react";
+import React, { ReactElement } from "react";
 import {
   omdbSchemaParser,
   googleBooksSchemaParser,
   igdbSchemaParser,
 } from "../Helpers/SchemaParsers";
-import {
-  MdLiveTv,
-  MdLocalMovies,
-  MdVideogameAsset,
-  MdChromeReaderMode,
-} from "react-icons/md";
-import { IconBaseProps } from "react-icons/lib";
 import { AdditionalRequest } from "../Types/common";
-
+import { LiveTv, Theaters, SportsEsports, MenuBook } from "@material-ui/icons";
+import imdbLogo from "../images/imdb.png";
+import igdbLogo from "../images/igdb.png";
+import googleBooksLogo from "../images/googlebooks.png";
+import { Media } from "../Types/common";
 export const MOVIE = "movie";
 export const TV_SHOW = "tvShow";
 export const GAME = "game";
 export const BOOK = "book";
-
-export type Media = {
-  label: string;
-  icon: ReactElement;
-  quadrant: number[];
-  url: string;
-  method: string;
-  headers: any;
-  schemaParser: any;
-  firestoreKey: string;
-  searchParam?: string;
-  dataFormatter?: (arg1: string) => string;
-  additionalRequest?: AdditionalRequest;
-  externalUrlFormatter: (arg1: any) => string;
-};
 
 const omdbAdditionalRequest = {
   description: "fetch rating",
@@ -46,7 +28,7 @@ const omdbAdditionalRequest = {
 export const media: Media[] = [
   {
     label: "Movie",
-    icon: <MdLocalMovies />,
+    icon: <Theaters />,
     quadrant: [1, 1],
     url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&type=movie`,
     method: "GET",
@@ -59,10 +41,15 @@ export const media: Media[] = [
     additionalRequest: omdbAdditionalRequest,
     externalUrlFormatter: (interpolatable): string =>
       `https://imdb.com/title/${interpolatable?.value?.id}`,
+    ratingSource: {
+      icon: imdbLogo,
+      name: "IMDB",
+      normalized: true,
+    },
   },
   {
     label: "TV Show",
-    icon: <MdLiveTv />,
+    icon: <LiveTv />,
     quadrant: [2, 1],
     url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&type=series`,
     method: "GET",
@@ -75,10 +62,15 @@ export const media: Media[] = [
     additionalRequest: omdbAdditionalRequest,
     externalUrlFormatter: (interpolatable): string =>
       `https://imdb.com/title/${interpolatable?.value?.id}`,
+    ratingSource: {
+      icon: imdbLogo,
+      name: "IMDB",
+      normalized: true,
+    },
   },
   {
     label: "Book",
-    icon: <MdChromeReaderMode />,
+    icon: <MenuBook />,
     quadrant: [1, 2],
     url: `https://www.googleapis.com/books/v1/volumes?key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}&projection=full&country=US`,
     method: "GET",
@@ -94,10 +86,15 @@ export const media: Media[] = [
       const refCode = "";
       return `https://amazon.com/s?k=${isbn}&ref=${refCode}`;
     },
+    ratingSource: {
+      icon: googleBooksLogo,
+      name: "Google Books",
+      normalized: false,
+    },
   },
   {
     label: "Game",
-    icon: <MdVideogameAsset />,
+    icon: <SportsEsports />,
     quadrant: [2, 2],
     url: "https://api-v3.igdb.com/games",
     method: "POST",
@@ -124,5 +121,10 @@ export const media: Media[] = [
     },
     externalUrlFormatter: (interpolatable): string =>
       interpolatable?.value?.url,
+    ratingSource: {
+      icon: igdbLogo,
+      name: "IGDB (Twitch)",
+      normalized: true,
+    },
   },
 ];

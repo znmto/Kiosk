@@ -10,23 +10,36 @@ import chroma from "chroma-js";
 import { useTheme, Theme } from "@material-ui/core/styles";
 import firebase from "../FirebaseConfig";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
-import { Typography, LinearProgress, Link } from "@material-ui/core";
+import {
+  Typography,
+  LinearProgress,
+  Link,
+  Grid,
+  Grow,
+} from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import Tooltip from "@material-ui/core/Tooltip";
 import { User } from "firebase";
 import { AdditionalRequest } from "../Types/common";
 import { useHistory } from "react-router-dom";
 import { TV_SHOW, MOVIE, GAME, BOOK } from "../Constants/media";
+import { Media } from "../Types/common";
 
 type StyleProps = {
   // x,y location of section in view
   quadrant?: number[];
   primary?: string;
   danger?: string;
-  colors?: any;
+  colors?: string;
 };
+
+const StyledArrowDownwardIcon = styled(ArrowDownwardIcon)`
+  font-size: 72px !important;
+  color: ${({ primary = "" }: StyleProps) => primary};
+`;
 
 const StyledMediaSelectorWrapper = styled.div`
   display: grid;
@@ -42,7 +55,9 @@ const StyledMediaSelectorWrapper = styled.div`
 `;
 
 const StyledIconWrapper = styled.div`
-  font-size: 36px;
+  & svg {
+    font-size: 32px;
+  }
   color: ${(props: StyleProps) => props.primary};
   display: grid;
   position: absolute;
@@ -105,58 +120,13 @@ const StyledExternalLinkIconContainer = styled(StlyedActionIcon)`
   }
 `;
 
-const selectStyles = {
-  control: (styles) => ({ ...styles, backgroundColor: "white" }),
-  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-    const color = "#000";
-    return {
-      ...styles,
-      backgroundColor: isDisabled
-        ? null
-        : isSelected
-        ? data.color
-        : isFocused
-        ? color
-        : null,
-      color: isDisabled
-        ? "#ccc"
-        : isSelected
-        ? chroma.contrast(color, "white") > 2
-          ? "white"
-          : "black"
-        : "#FFF",
-      cursor: isDisabled ? "not-allowed" : "pointer",
-
-      ":active": {
-        ...styles[":active"],
-        backgroundColor: !isDisabled && (isSelected ? color : color),
-      },
-    };
-  },
-  input: (styles) => ({ ...styles }),
-  placeholder: (styles) => ({ ...styles }),
-  singleValue: (styles, { data }) => ({ ...styles }),
-};
-
-type AsyncSelectWrapper = {
-  label: string;
-  url: string;
-  headers: any;
-  method: string;
-  data?: any;
-  dataFormatter?: (string) => string;
-  searchParam?: string;
-  schemaParser: any;
-  icon: React.ReactElement;
-  firestoreKey: string;
-  quadrant: number[];
-  externalUrlFormatter: (string) => string;
-  additionalRequest?: AdditionalRequest;
+type AdditionalAsyncSelectProps = {
   publicUserId?: string;
 };
+type AsyncSelectProps = Media & AdditionalAsyncSelectProps;
 
-const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
-  (props: AsyncSelectWrapper) => {
+const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
+  (props: AsyncSelectProps) => {
     const {
       label,
       url: apiUrl,
@@ -172,6 +142,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       externalUrlFormatter,
       additionalRequest,
       publicUserId,
+      ratingSource,
     } = props;
 
     const theme: Theme = useTheme();
@@ -183,32 +154,36 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       SelectionContext
     );
     const selected = selections[firestoreKey] || {};
+
     const updateMatchesInDb = async (optionCopy) => {
-      const mediaCollection = await firestore.collection("media");
-      const matchFields = mediaCollection.doc(optionCopy?.id);
-      const {
-        user: { avatar = "", fullName = "" },
-      } = metadata;
-      matchFields.get().then((doc) => {
-        console.log("metadata", metadata);
-        if (!doc.exists) {
-          // add match document if it doesnt exist already
-          mediaCollection.doc(optionCopy?.id).set({
-            title: optionCopy?.value?.title,
-            currentlySelectedBy: [
-              { id: user.uid, email: user.email, avatar, fullName },
-            ],
-          });
-        } else {
-          // otherwise append current uid to collection
-          matchFields.update({
-            currentlySelectedBy: [
-              ...doc.data()!.currentlySelectedBy,
-              { id: user.uid, email: user.email, avatar, fullName },
-            ],
-          });
-        }
-      });
+      try {
+        const mediaCollection = await firestore.collection("media");
+        const matchFields = mediaCollection.doc(optionCopy?.id);
+        const {
+          user: { avatar = "", fullName = "" },
+        } = metadata;
+        matchFields.get().then((doc) => {
+          if (!doc.exists) {
+            // add match document if it doesnt exist already
+            mediaCollection.doc(optionCopy?.id).set({
+              title: optionCopy?.value?.title,
+              currentlySelectedBy: [
+                { id: user.uid, email: user.email, avatar, fullName },
+              ],
+            });
+          } else {
+            // otherwise append current uid to collection
+            matchFields.update({
+              currentlySelectedBy: [
+                ...doc.data()!.currentlySelectedBy,
+                { id: user.uid, email: user.email, avatar, fullName },
+              ],
+            });
+          }
+        });
+      } catch (error) {
+        console.log("updateMatchesInDb error", error);
+      }
     };
 
     const handleOnChange = async (selectedOption) => {
@@ -217,49 +192,49 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       });
       // if we need to make a 2nd call to augment the user selection, do it on change
       // api specific
-      if (!isEmpty(additionalRequest)) {
-        const {
-          url: additionalRequestUrl,
-          matchFieldName,
-        } = additionalRequest!;
-        if (firestoreKey === GAME) {
-          const additionalResponse = await augmentWithAdditionalRequest({
-            customUrl: additionalRequestUrl,
-            customBody: `where id = ${optionCopy?.value[matchFieldName]}; fields *;`,
-          });
-          const lowResImageUrl = additionalResponse[0].url;
-          const highResImageUrl = lowResImageUrl.replace(
-            "t_thumb",
-            "t_original"
-          );
-          const imageUrl = `https:${highResImageUrl}`;
-          optionCopy.value.image = imageUrl;
+      try {
+        if (!isEmpty(additionalRequest)) {
+          const {
+            url: additionalRequestUrl,
+            matchFieldName,
+          } = additionalRequest!;
+          if (firestoreKey === GAME) {
+            const additionalResponse = await augmentWithAdditionalRequest({
+              customUrl: additionalRequestUrl,
+              customBody: `where id = ${optionCopy?.value[matchFieldName]}; fields *;`,
+            });
+            const lowResImageUrl = additionalResponse[0].url;
+            const highResImageUrl = lowResImageUrl.replace(
+              "t_thumb",
+              "t_original"
+            );
+            const imageUrl = `https:${highResImageUrl}`;
+            optionCopy.value.image = imageUrl;
+          }
+          if ([MOVIE, TV_SHOW].includes(firestoreKey)) {
+            const additionalResponse = await augmentWithAdditionalRequest({
+              customUrl: `${additionalRequestUrl}&i=${optionCopy?.value[matchFieldName]}`,
+            });
+            const normalizedRating =
+              parseFloat(additionalResponse?.imdbRating) / 2;
+            optionCopy.value.rating = normalizedRating;
+          }
         }
-        if ([MOVIE, TV_SHOW].includes(firestoreKey)) {
-          const additionalResponse = await augmentWithAdditionalRequest({
-            customUrl: `${additionalRequestUrl}&i=${optionCopy?.value[matchFieldName]}`,
-          });
-          const normalizedRating =
-            parseFloat(additionalResponse?.imdbRating) / 2;
-          optionCopy.value.rating = normalizedRating;
-          console.log("additionalResponse", additionalResponse);
-        }
-      }
-      console.log("optionCopy", optionCopy);
-      // get user data from DB
-      const fields = await firestore.collection("users").doc(user.uid);
-      console.log("fields", fields);
+        // get user data from DB
+        const fields = await firestore.collection("users").doc(user.uid);
 
-      // update field in DB
-      await fields.update({
-        [firestoreKey]: optionCopy,
-      });
-      window.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>after");
+        // update field in DB
+        await fields.update({
+          [firestoreKey]: optionCopy,
+        });
+      } catch (error) {
+        console.log("handleOnChange error", error);
+      }
 
       updateMatchesInDb(optionCopy);
     };
 
-    const handleOnFocus = (_) => console.log("onFocus");
+    const handleOnFocus = (_) => console.log("onFocus"); // for later use
 
     const handleLoadOptions = (inputValue: string, callback) => {
       if (!inputValue) return callback([]);
@@ -274,8 +249,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
       customUrl: string;
     }) => {
       const { method, headers, description } = props.additionalRequest!;
-      console.log("customBody, customUrl", customBody, customUrl);
-      window.console.log(`additional request initated to ${description}`);
       try {
         const { data: response } = await axios({
           url: FIREBASE_PROXY_URL,
@@ -291,10 +264,12 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
             headers,
           },
         });
-        console.log("additional response", response);
         return response;
       } catch (error) {
-        console.log("error", error);
+        console.log(
+          `augmentWithAdditionalRequest for ${description} error`,
+          error
+        );
       }
     };
 
@@ -306,7 +281,7 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
         const parametrizedUrl = searchParam
           ? apiUrl.concat(`&${searchParam}=${maybeInput}`)
           : apiUrl;
-        const { data: response, status } = await axios({
+        const { data: response } = await axios({
           url: FIREBASE_PROXY_URL,
           method: "POST",
           headers: {
@@ -320,12 +295,10 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
             headers,
           },
         });
-
         // use custom schema parsing function to manipulate API response data
-        console.log("response", response);
         return callback(schemaParser(response));
       } catch (error) {
-        console.log("error", error);
+        console.log("callCloudFn error", error);
       }
     };
 
@@ -336,9 +309,17 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
     };
 
     const getDecription = (): ReactElement => {
+      const StyledRatingSourceIconWrapper = styled.div`
+        display: inline-block;
+        margin-left: 15px;
+        img {
+          width: 50px;
+        }
+      `;
       const {
         value: { title = "", subtitle = "", id = "", rating = null } = {},
       } = selected;
+      const { icon, name, normalized } = ratingSource;
       if (!isEmpty(selected)) {
         return (
           <StyledDescriptionContainer>
@@ -353,20 +334,49 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
             <Typography variant="h6">{subtitle}</Typography>
             {rating && (
               <>
-                <Rating
-                  name="read-only"
-                  value={rating}
-                  precision={0.1}
-                  size="large"
-                  readOnly
-                />
-                <Typography>{rating} / 5</Typography>
+                <Grid container direction="column">
+                  <Grid item>
+                    <Rating
+                      name="read-only"
+                      value={rating}
+                      precision={0.1}
+                      size="large"
+                      readOnly
+                    />
+                  </Grid>
+                  <Grid item container justify="center">
+                    <Typography>{rating} / 5</Typography>
+                    <Tooltip
+                      placement="bottom"
+                      title={
+                        <Typography variant="body2">
+                          {`${normalized ? "Normalized from " : ""}${name}`}
+                        </Typography>
+                      }
+                    >
+                      <StyledRatingSourceIconWrapper>
+                        <img src={icon} alt="rating source icon" />
+                      </StyledRatingSourceIconWrapper>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
               </>
             )}
           </StyledDescriptionContainer>
         );
       }
-      return <></>;
+      return (
+        <Grid container direction="column" alignItems="center">
+          <Grid item>
+            <Typography variant="h5">{`Search for a ${label} below`}</Typography>
+          </Grid>
+          <Grow in style={{ transformOrigin: "0 0 0" }} timeout={3000}>
+            <Grid item>
+              <StyledArrowDownwardIcon primary={theme.palette.primary.main} />
+            </Grid>
+          </Grow>
+        </Grid>
+      );
     };
 
     const handleClear = async () => {
@@ -477,7 +487,6 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
               loadingMessage={() => <StyledLoader />}
               noOptionsMessage={() => "No search results"}
               onFocus={handleOnFocus}
-              // styles={selectStyles}
             />
           </StyledAsyncSelectWrapper>
         )}
@@ -493,4 +502,4 @@ const AsyncSelectWrapper: React.FC<AsyncSelectWrapper> = memo(
   }
 );
 
-export default AsyncSelectWrapper;
+export default AsyncSelectProps;

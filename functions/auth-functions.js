@@ -5,8 +5,6 @@ const express = require("express");
 const app = express();
 // Add headers
 app.use(function (req, res, next) {
-  console.log("process.env", process.env);
-  console.log("req", req.headers);
   const allowedOrigins = ["http://localhost:3000", "https://majora-563d6.web.app"];
   if (allowedOrigins.indexOf(req.headers.origin) !== -1) {
     res.set("Access-Control-Allow-Origin", req.headers.origin);
@@ -16,7 +14,6 @@ app.use(function (req, res, next) {
 });
 
 app.get("/getUsersById", (req, res) => {
-  console.log("in route");
   const promises = [];
   const ids = req.query.ids.split(",");
   ids.forEach(id =>
@@ -52,7 +49,6 @@ app.post("/addFriend", (req, res) => {
     .then(({ uid }) => (user.uid = uid))
     .then(async something => {
       // TODO: fix this noob code
-      console.log("something", something);
       const fields = await admin.firestore.collection("users").doc(currentUserUid);
       const existingFriends = fields.friends;
       const updatedFriends = existingFriends.concat(user);
