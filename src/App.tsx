@@ -6,10 +6,8 @@ import {
   Switch,
 } from "react-router-dom";
 import SignupOrLogin from "./Views/SignupOrLogin";
-import Profile from "./Views/Profile";
 import Home from "./Views/Home";
 import Activity from "./Views/Activity";
-import { useTheme, Theme } from "@material-ui/core/styles";
 import Layout from "./Views/Layout";
 import Matches from "./Views/Matches";
 import {

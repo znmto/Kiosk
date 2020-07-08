@@ -4,12 +4,12 @@ import {
   googleBooksSchemaParser,
   igdbSchemaParser,
 } from "../Helpers/SchemaParsers";
-import { AdditionalRequest } from "../Types/common";
+import { AdditionalRequest } from "../Types/shared";
 import { LiveTv, Theaters, SportsEsports, MenuBook } from "@material-ui/icons";
 import imdbLogo from "../images/imdb.png";
 import igdbLogo from "../images/igdb.png";
 import googleBooksLogo from "../images/googlebooks.png";
-import { Media } from "../Types/common";
+import { Media } from "../Types/shared";
 export const MOVIE = "movie";
 export const TV_SHOW = "tvShow";
 export const GAME = "game";

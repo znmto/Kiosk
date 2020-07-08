@@ -19,7 +19,7 @@ type OMDBParsedData = {
 };
 type GoogleBooksParsedData = {
   id: string;
-  isbn13?: any;
+  isbn13?: string;
   title: string;
   subtitle: string;
   image?: string;
@@ -33,7 +33,7 @@ type IGDBParsedData = {
   cover: number;
   url: string;
   type: string;
-  rating: any;
+  rating: string;
 };
 
 export const omdbSchemaParser = (
@@ -81,7 +81,7 @@ export const googleBooksSchemaParser = (
         id,
         isbn13:
           industryIdentifiers.find((i) => i.type === "ISBN_13")?.identifier ||
-          null,
+          "",
         title,
         subtitle: `${authors?.[0]}, ${publishedDate?.slice(0, 4)}`,
         image,
@@ -106,7 +106,7 @@ export const igdbSchemaParser = (
         cover,
         type: "game",
         url,
-        rating: rating ? (rating / 20).toFixed(1) : null,
+        rating: rating ? (rating / 20).toFixed(1) : "",
       },
     })
   );

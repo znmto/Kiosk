@@ -2,7 +2,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import {
-  Avatar,
   Button,
   CssBaseline,
   TextField,
@@ -11,25 +10,21 @@ import {
   Link,
   Grid,
   Card,
-  CardMedia,
   Typography,
   makeStyles,
-  CardHeader,
   CardContent,
 } from "@material-ui/core";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Container from "@material-ui/core/Container";
 import firebase from "../FirebaseConfig";
-import { SIGNUP, LOGIN, HOME, ACTIVITY } from "../Constants/routes";
+import { SIGNUP, LOGIN, ACTIVITY } from "../Constants/routes";
 import { UserCredential } from "firebase/firebase-auth";
 import { DocumentReference } from "firebase/firebase-app";
 import List from "@material-ui/core/List";
-import ListItem, { ListItemProps } from "@material-ui/core/ListItem";
+import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import LockIcon from "@material-ui/icons/Lock";
-import styled from "styled-components";
 import { useTheme, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.common.white,
     },
   },
+  sampleLoginsCard: { margin: "50px 0" },
   paper: {
     marginTop: theme.spacing(8),
     display: "flex",
@@ -64,22 +60,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const StyledSampleLoginsCard = styled(Card)`
-  margin: 50px 0;
-`;
-
 const SignupOrLogin = (props) => {
   const firebaseAuth = firebase.auth();
-  const firestore = firebase.firestore();
 
   const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
   const theme: Theme = useTheme();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [authError, setAuthError] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [authError, setAuthError] = useState<string>("");
 
   const isSignup: boolean = location.pathname === SIGNUP;
 
@@ -117,11 +108,10 @@ const SignupOrLogin = (props) => {
           unsubscribe();
         },
       });
-      // redirect to home
       history.push(ACTIVITY);
     } catch (error) {
       setAuthError(error.message);
-      console.error(error);
+      console.error("handleSignup error", error);
     }
   };
 
@@ -135,16 +125,12 @@ const SignupOrLogin = (props) => {
         password
       );
       const { additionalUserInfo, credential, operationType, user } = res;
-      // redirect to home if successful
       res.user && history.push(ACTIVITY);
     } catch (error) {
       setAuthError(error.message);
-      console.error(error);
+      console.error("handleLogin error", error);
     }
   };
-
-  // useEffect(() => console.log('labelsMap', labelsMap['title']), []);
-  // useEffect(() => console.log('email / pass change', email, password), [email, password]);
 
   return (
     <Suspense fallback={<h1>LOADING</h1>}>
@@ -152,7 +138,7 @@ const SignupOrLogin = (props) => {
         <CssBaseline />
         <div className={classes.paper}>
           {!isSignup && (
-            <StyledSampleLoginsCard variant="outlined">
+            <Card className={classes.sampleLoginsCard} variant="outlined">
               <CardContent>
                 <Typography variant="h5" align="center">
                   Sample Logins
@@ -195,7 +181,7 @@ const SignupOrLogin = (props) => {
                   </ListItem>
                 </List>
               </CardContent>
-            </StyledSampleLoginsCard>
+            </Card>
           )}
           <Typography component="h1" variant="h5">
             {labelsMap["title"]}

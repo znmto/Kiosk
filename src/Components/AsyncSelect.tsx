@@ -1,5 +1,4 @@
 import "isomorphic-fetch";
-
 import { BOOK, GAME, MOVIE, TV_SHOW } from "../Constants/media";
 import {
   Grid,
@@ -8,19 +7,24 @@ import {
   Link,
   Typography,
 } from "@material-ui/core";
-import React, { ReactElement, memo, useContext, useEffect } from "react";
+import React, {
+  ReactElement,
+  memo,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
 import { SelectionContext, useSession } from "../Helpers/CustomHooks";
 import { Theme, useTheme } from "@material-ui/core/styles";
-
-import { AdditionalRequest } from "../Types/common";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import AsyncSelect from "react-select/async";
 import { FIREBASE_PROXY_URL } from "../Constants/api";
 import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
-import { Media } from "../Types/common";
+import { Media } from "../Types/shared";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import Rating from "@material-ui/lab/Rating";
 import Tooltip from "@material-ui/core/Tooltip";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { User } from "firebase";
 import axios from "axios";
 import debounce from "debounce-promise";
@@ -155,6 +159,8 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       SelectionContext
     );
     const selected = selections[firestoreKey] || {};
+
+    const [loading, setLoading] = useState<boolean>(false);
 
     const updateMatchesInDb = async (optionCopy) => {
       try {
@@ -334,7 +340,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
                 {title}
               </Link>
             </Typography>
-            <Typography variant="h6">{subtitle}</Typography>
+            <Typography variant="body1">{subtitle}</Typography>
             {rating && (
               <>
                 <Grid container direction="column">
@@ -405,6 +411,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
     };
 
     useEffect(() => {
+      setLoading(true);
       if (publicUserId) {
         const publicUserRes = firebase
           .firestore()
@@ -420,7 +427,9 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             }
             const selected = doc.data() && doc.data()![firestoreKey];
             return setSelection({ [firestoreKey]: selected });
-          });
+          })
+          .catch((e) => console.log("get public user error", e))
+          .finally(() => setLoading(false));
       } else if (user?.uid) {
         const listener = firebase
           .firestore()
@@ -435,6 +444,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
               setMetadata({ user: { fullName, avatar } });
             }
             const selected = doc.data() && doc.data()![firestoreKey];
+            setLoading(false);
             return setSelection({ [firestoreKey]: selected });
           });
         // unsubscribe listener
@@ -446,58 +456,66 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
         quadrant={quadrant}
         primary={theme.palette.primary.main}
       >
-        <StyledActionIconsContainer>
-          {!isEmpty(selected) && !publicUserId && (
-            <StyledTrashIconContainer
-              danger={theme.palette.error.main}
-              onClick={handleClear}
-            >
-              <Tooltip title="Delete">
-                <HighlightOffOutlinedIcon />
-              </Tooltip>
-            </StyledTrashIconContainer>
-          )}
-
-          {!isEmpty(selected) && (
-            <StyledExternalLinkIconContainer
-              primary={theme.palette.primary.main}
-            >
-              <Tooltip title="Open in new tab">
-                <a
-                  href={externalUrlFormatter(selected)}
-                  rel="noopener noreferrer"
+        {loading ? (
+          <CircularProgress style={{ color: "#325247" }} size={60} />
+        ) : (
+          <>
+            <StyledActionIconsContainer>
+              {!isEmpty(selected) && !publicUserId && (
+                <StyledTrashIconContainer
+                  danger={theme.palette.error.main}
+                  onClick={handleClear}
                 >
-                  <OpenInNewIcon />
-                </a>
-              </Tooltip>
-            </StyledExternalLinkIconContainer>
-          )}
-        </StyledActionIconsContainer>
-        {getImage()}
-        {getDecription()}
-        {isEmpty(selected) && !publicUserId && (
-          <StyledAsyncSelectWrapper>
-            <AsyncSelect
-              value={selected}
-              // cacheOptions
-              loadOptions={debounce(handleLoadOptions, 500, { leading: true })}
-              defaultOptions={true}
-              placeholder="Start typing to search..."
-              onChange={handleOnChange}
-              isClearable
-              loadingMessage={() => <StyledLoader />}
-              noOptionsMessage={() => "No search results"}
-              onFocus={handleOnFocus}
-            />
-          </StyledAsyncSelectWrapper>
+                  <Tooltip title="Delete">
+                    <HighlightOffOutlinedIcon />
+                  </Tooltip>
+                </StyledTrashIconContainer>
+              )}
+
+              {!isEmpty(selected) && (
+                <StyledExternalLinkIconContainer
+                  primary={theme.palette.primary.main}
+                >
+                  <Tooltip title="Open in new tab">
+                    <a
+                      href={externalUrlFormatter(selected)}
+                      rel="noopener noreferrer"
+                    >
+                      <OpenInNewIcon />
+                    </a>
+                  </Tooltip>
+                </StyledExternalLinkIconContainer>
+              )}
+            </StyledActionIconsContainer>
+            {getImage()}
+            {getDecription()}
+            {isEmpty(selected) && !publicUserId && (
+              <StyledAsyncSelectWrapper>
+                <AsyncSelect
+                  value={selected}
+                  // cacheOptions
+                  loadOptions={debounce(handleLoadOptions, 500, {
+                    leading: true,
+                  })}
+                  defaultOptions={true}
+                  placeholder="Start typing to search..."
+                  onChange={handleOnChange}
+                  isClearable
+                  loadingMessage={() => <StyledLoader />}
+                  noOptionsMessage={() => "No search results"}
+                  onFocus={handleOnFocus}
+                />
+              </StyledAsyncSelectWrapper>
+            )}
+            <StyledIconWrapper
+              primary={theme.palette.primary.main}
+              quadrant={quadrant}
+              alt={label}
+            >
+              {icon}
+            </StyledIconWrapper>
+          </>
         )}
-        <StyledIconWrapper
-          primary={theme.palette.primary.main}
-          quadrant={quadrant}
-          alt={label}
-        >
-          {icon}
-        </StyledIconWrapper>
       </StyledMediaSelectorWrapper>
     );
   }

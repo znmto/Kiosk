@@ -8,8 +8,8 @@ import isEmpty from "lodash/isEmpty";
 import { useParams } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Link from "@material-ui/core/Link";
-import { MatchesParams } from "../Types/common";
-import { Media } from "../Types/common";
+import { MatchesParams } from "../Types/shared";
+import { Media } from "../Types/shared";
 
 const useStyles = makeStyles((theme: Theme) => ({
   matchesMediaThumbnail: {
@@ -67,7 +67,6 @@ const Matches: React.FC = (props) => {
               .doc(selections![k.firestoreKey]?.id)
               .get()
               .then((doc) => {
-                console.log("doc.data()", doc.data());
                 const stateCopy = state.usersThatHaveSelected;
                 stateCopy[k.firestoreKey] = doc.data()!.currentlySelectedBy;
                 return dispatch({
@@ -80,6 +79,7 @@ const Matches: React.FC = (props) => {
       getSetUsersThatHaveSelected();
     }
   }, [selections]);
+
   return (
     <Grid
       className={classes.matchesWrapper}

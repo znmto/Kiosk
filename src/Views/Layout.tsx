@@ -14,10 +14,6 @@ const StyledLayoutWrapper = styled.div`
   margin-bottom: 55px;
 `;
 
-const StyledRootWrapper = styled.div`
-  overflow-y: scroll;
-`;
-
 // https://paletton.com/#uid=3360u0kcvfm7JpEaLkAhQcem+9S
 const theme: Theme = createMuiTheme({
   palette: {
@@ -42,13 +38,11 @@ const theme: Theme = createMuiTheme({
 const Layout: React.FC = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
-      <StyledRootWrapper>
-        <TopNavigation />
-        <StyledLayoutWrapper>
-          <div>{children}</div>
-        </StyledLayoutWrapper>
-        <BottomNavigation />
-      </StyledRootWrapper>
+      <TopNavigation />
+      <StyledLayoutWrapper>
+        <div>{children}</div>
+      </StyledLayoutWrapper>
+      <BottomNavigation />
     </ThemeProvider>
   );
 };

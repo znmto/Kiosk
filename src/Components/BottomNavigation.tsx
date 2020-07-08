@@ -17,7 +17,7 @@ import {
 } from "../Constants/routes";
 import { User } from "firebase";
 import { useSession } from "../Helpers/CustomHooks";
-import { MatchesParams, PublicViewParam } from "../Types/common";
+import { MatchesParams, PublicViewParam } from "../Types/shared";
 
 const useStyles = makeStyles((theme: Theme) => ({
   bottomNavigation: {

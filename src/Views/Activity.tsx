@@ -1,8 +1,7 @@
 import React, { memo, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core";
-import { useTheme, Theme } from "@material-ui/core/styles";
-import styled from "styled-components";
+import { Theme } from "@material-ui/core/styles";
 import AsyncSelect from "../Components/AsyncSelect";
 import { useSession } from "../Helpers/CustomHooks";
 import { FIREBASE_GET_ID_URL } from "../Constants/api";
@@ -15,22 +14,16 @@ import { SelectionContext } from "../Helpers/CustomHooks";
 import { useHistory } from "react-router-dom";
 import { Typography, Grid } from "@material-ui/core";
 import { Share } from "@material-ui/icons";
-import { Media } from "../Types/common";
+import { Media } from "../Types/shared";
 
 type PublicUser = {
   email: string;
   uid: string;
 };
 
-const StyledMediaSelectionWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-content: space-evenly;
-`;
-
 const useStyles = makeStyles((theme: Theme) => ({
   shareableLinkContainer: {
-    padding: "40px 0 20px",
+    padding: "40px 0",
     "& input": {
       width: "300px",
       padding: "5px",
@@ -51,11 +44,12 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const { match: { params = {} } = {} } = props;
   const publicUid = params?.publicUid;
 
-  const [publicUser, setPublicUser] = useState<PublicUser>();
   const user: User = useSession();
   const classes = useStyles();
   const history = useHistory();
   const { metadata }: any = useContext(SelectionContext);
+
+  const [publicUser, setPublicUser] = useState<PublicUser>();
 
   const getUserNamesById = async (userIdArr: string[]) => {
     const userIdParam = userIdArr.join(",");
@@ -102,11 +96,13 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
           </Grid>
         </>
       )}
-      <StyledMediaSelectionWrapper>
+      <Grid container justify="space-evenly">
         {media.map((m: Media) => (
-          <AsyncSelect publicUserId={publicUid} key={m.label} {...m} />
+          <Grid item xs={6}>
+            <AsyncSelect publicUserId={publicUid} key={m.label} {...m} />
+          </Grid>
         ))}
-      </StyledMediaSelectionWrapper>
+      </Grid>
     </>
   );
 });
