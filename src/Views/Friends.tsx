@@ -1,3 +1,35 @@
+/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+THIS COMPONENT IS DEPRECATED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
 import React, { useState, useEffect } from "react";
 import {
   Button,

@@ -6,6 +6,7 @@ import {
   createMuiTheme,
   Theme as AugmentedTheme,
   ThemeProvider,
+  Theme,
 } from "@material-ui/core/styles";
 
 const StyledLayoutWrapper = styled.div`
@@ -18,7 +19,7 @@ const StyledRootWrapper = styled.div`
 `;
 
 // https://paletton.com/#uid=3360u0kcvfm7JpEaLkAhQcem+9S
-const theme = createMuiTheme({
+const theme: Theme = createMuiTheme({
   palette: {
     primary: {
       main: "#325247",

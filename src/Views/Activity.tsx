@@ -17,10 +17,6 @@ import { Typography, Grid } from "@material-ui/core";
 import { Share } from "@material-ui/icons";
 import { Media } from "../Types/common";
 
-type StyleProps = {
-  color?: string;
-};
-
 type PublicUser = {
   email: string;
   uid: string;
@@ -47,21 +43,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface ActivityProps {
+type ActivityProps = {
   match?: any;
-}
+};
 
 const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const { match: { params = {} } = {} } = props;
   const publicUid = params?.publicUid;
 
   const [publicUser, setPublicUser] = useState<PublicUser>();
-  const theme: Theme = useTheme();
   const user: User = useSession();
   const classes = useStyles();
   const history = useHistory();
   const { metadata }: any = useContext(SelectionContext);
-  console.log("metadata", metadata);
 
   const getUserNamesById = async (userIdArr: string[]) => {
     const userIdParam = userIdArr.join(",");
@@ -73,7 +67,6 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
           ids: userIdParam,
         },
       });
-      console.log("data", data);
       const publicUser: PublicUser = data[0];
       return setPublicUser(publicUser);
     } catch (error) {

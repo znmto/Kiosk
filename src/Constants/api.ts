@@ -1,7 +1,5 @@
 const inProd = process.env.NODE_ENV !== "development";
-console.log("inProd", inProd);
-
-const path = inProd
+const path: string | undefined = inProd
   ? process.env.REACT_APP_API_URL
   : `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_API_PATH}`;
 

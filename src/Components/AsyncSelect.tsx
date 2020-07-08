@@ -1,32 +1,33 @@
 import "isomorphic-fetch";
-import axios from "axios";
-import React, { useEffect, memo, useContext, ReactElement } from "react";
-import AsyncSelect from "react-select/async";
-import styled from "styled-components";
-import debounce from "debounce-promise";
-import isEmpty from "lodash/isEmpty";
-import { FIREBASE_PROXY_URL } from "../Constants/api";
-import chroma from "chroma-js";
-import { useTheme, Theme } from "@material-ui/core/styles";
-import firebase from "../FirebaseConfig";
-import { useSession, SelectionContext } from "../Helpers/CustomHooks";
+
+import { BOOK, GAME, MOVIE, TV_SHOW } from "../Constants/media";
 import {
-  Typography,
-  LinearProgress,
-  Link,
   Grid,
   Grow,
+  LinearProgress,
+  Link,
+  Typography,
 } from "@material-ui/core";
-import Rating from "@material-ui/lab/Rating";
-import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
-import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+import React, { ReactElement, memo, useContext, useEffect } from "react";
+import { SelectionContext, useSession } from "../Helpers/CustomHooks";
+import { Theme, useTheme } from "@material-ui/core/styles";
+
+import { AdditionalRequest } from "../Types/common";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import AsyncSelect from "react-select/async";
+import { FIREBASE_PROXY_URL } from "../Constants/api";
+import HighlightOffOutlinedIcon from "@material-ui/icons/HighlightOffOutlined";
+import { Media } from "../Types/common";
+import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+import Rating from "@material-ui/lab/Rating";
 import Tooltip from "@material-ui/core/Tooltip";
 import { User } from "firebase";
-import { AdditionalRequest } from "../Types/common";
+import axios from "axios";
+import debounce from "debounce-promise";
+import firebase from "../FirebaseConfig";
+import isEmpty from "lodash/isEmpty";
+import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { TV_SHOW, MOVIE, GAME, BOOK } from "../Constants/media";
-import { Media } from "../Types/common";
 
 type StyleProps = {
   // x,y location of section in view
@@ -325,8 +326,10 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
           <StyledDescriptionContainer>
             <Typography variant="h5">
               <Link
-                style={{ cursor: "pointer" }}
-                onClick={() => history.push(`matches/${firestoreKey}`)}
+                style={{ cursor: publicUserId ? "initial" : "pointer" }}
+                onClick={() =>
+                  !publicUserId && history.push(`matches/${firestoreKey}`)
+                }
               >
                 {title}
               </Link>

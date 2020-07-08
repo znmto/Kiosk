@@ -15,7 +15,7 @@ export const TV_SHOW = "tvShow";
 export const GAME = "game";
 export const BOOK = "book";
 
-const omdbAdditionalRequest = {
+const omdbAdditionalRequest: AdditionalRequest = {
   description: "fetch rating",
   matchFieldName: "id",
   url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}`,

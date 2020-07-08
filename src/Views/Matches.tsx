@@ -48,7 +48,7 @@ const Matches: React.FC = (props) => {
   const classes = useStyles();
   const user: User = useSession();
   const params = useParams<MatchesParams>();
-  const { selections, _ }: any = useContext(SelectionContext);
+  const { selections }: any = useContext(SelectionContext);
 
   const reducer = (state, payload) => ({ ...state, ...payload });
   const [state, dispatch] = useReducer(reducer, {

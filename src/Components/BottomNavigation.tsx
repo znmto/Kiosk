@@ -5,16 +5,7 @@ import {
   makeStyles,
   Theme,
 } from "@material-ui/core";
-import {
-  SupervisorAccount,
-  Home,
-  Favorite,
-  Face,
-  EmojiObjects,
-  Announcement,
-  ArtTrack,
-  Extension,
-} from "@material-ui/icons";
+import { Favorite, Face, Extension } from "@material-ui/icons";
 import { useRouteMatch, useLocation, useHistory } from "react-router-dom";
 import {
   HOME,
@@ -42,10 +33,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const BottomNav: React.FC = (props) => {
+type BottomNavProps = {};
+
+const BottomNav: React.FC<BottomNavProps> = (props: BottomNavProps) => {
   const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
+  const user: User = useSession();
+
   const { params: { publicUid = "", showOnly = "" } = {} } =
     (useRouteMatch<MatchesParams | PublicViewParam>({
       path: [PUBLIC_ACTIVITY, MATCHES_FILTER],
@@ -55,9 +50,6 @@ const BottomNav: React.FC = (props) => {
 
   // default view
   const [route, setRoute] = React.useState<string>(location?.pathname);
-
-  console.log("location", location);
-  const user: User = useSession();
 
   const navigate = (route: string): void => history.push(route);
 

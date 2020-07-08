@@ -31,8 +31,6 @@ import { UserCredential } from "firebase/firebase-auth";
 import { CircularProgress, Grid } from "@material-ui/core";
 
 const App: React.FC = () => {
-  const theme: Theme = useTheme();
-
   const {
     initializing,
     user,

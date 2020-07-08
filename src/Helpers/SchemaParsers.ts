@@ -4,7 +4,41 @@ import {
   IGDBGameArr,
 } from "../Types/ApiResponses";
 
-export const omdbSchemaParser = (apiResponse: OMDBMovieArr) => {
+interface ParsedData<T> {
+  label: string;
+  value: T;
+}
+
+type OMDBParsedData = {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  type: string;
+  rating: number;
+};
+type GoogleBooksParsedData = {
+  id: string;
+  isbn13?: any;
+  title: string;
+  subtitle: string;
+  image?: string;
+  type: string;
+  rating: number;
+};
+type IGDBParsedData = {
+  id: number;
+  title: string;
+  subtitle: number;
+  cover: number;
+  url: string;
+  type: string;
+  rating: any;
+};
+
+export const omdbSchemaParser = (
+  apiResponse: OMDBMovieArr
+): ParsedData<OMDBParsedData>[] => {
   return apiResponse.Search.map(
     ({
       Title: title = "",
@@ -27,8 +61,9 @@ export const omdbSchemaParser = (apiResponse: OMDBMovieArr) => {
   );
 };
 
-export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
-  console.log("apiResponse", apiResponse);
+export const googleBooksSchemaParser = (
+  apiResponse: GoogleBooksArr
+): ParsedData<GoogleBooksParsedData>[] => {
   return apiResponse.items.map(
     ({
       id,
@@ -38,7 +73,7 @@ export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
         imageLinks: { thumbnail: image } = {},
         industryIdentifiers = [],
         publishedDate = "",
-        averageRating = null,
+        averageRating = 0,
       },
     }) => ({
       label: `${title} (${authors?.[0]})`,
@@ -57,10 +92,12 @@ export const googleBooksSchemaParser = (apiResponse: GoogleBooksArr) => {
   );
 };
 
-export const igdbSchemaParser = (apiResponse: IGDBGameArr) => {
+export const igdbSchemaParser = (
+  apiResponse: IGDBGameArr
+): ParsedData<IGDBParsedData>[] => {
   console.log("apiResponse", apiResponse);
   return apiResponse.map(
-    ({ id, name: title, first_release_date = 0, cover, url, rating }) => ({
+    ({ id, name: title, first_release_date = 0, cover = 0, url, rating }) => ({
       label: `${title}`,
       value: {
         id,

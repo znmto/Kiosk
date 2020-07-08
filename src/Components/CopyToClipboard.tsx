@@ -1,34 +1,32 @@
 import React, { memo, useReducer } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import TextField from "@material-ui/core/TextField";
+import { TextField, Tooltip, makeStyles, Theme } from "@material-ui/core";
 import { User } from "firebase";
 import { useSession } from "../Helpers/CustomHooks";
-import Tooltip from "@material-ui/core/Tooltip";
-import AssignmentOutlinedIcon from "@material-ui/icons/AssignmentOutlined";
-import styled from "styled-components";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import AssignmentTurnedInOutlinedIcon from "@material-ui/icons/AssignmentTurnedInOutlined";
-import { useTheme, Theme } from "@material-ui/core/styles";
+import {
+  AssignmentOutlined,
+  AssignmentTurnedInOutlined,
+} from "@material-ui/icons";
 
 type StyleProps = {
   primary?: string;
   secondary?: string;
 };
 
-const StyledAssignmentOutlinedIcon = styled(AssignmentOutlinedIcon)`
-  cursor: pointer;
-  color: ${(props: StyleProps) => props.secondary};
-`;
-const StyledAssignmentTurnedInOutlinedIcon = styled(
-  AssignmentTurnedInOutlinedIcon
-)`
-  cursor: pointer;
-  color: ${(props: StyleProps) => props.primary};
-`;
+const useStyles = makeStyles((theme: Theme) => ({
+  assignmentOutlinedIcon: {
+    cursor: "pointer",
+    color: theme.palette.primary.main,
+  },
+  assignmentTurnedInOutlinedIcon: {
+    cursor: "pointer",
+    color: theme.palette.primary.main,
+  },
+}));
 
-const ClipBoardCopy = memo(() => {
+const ClipBoardCopy: React.FC = memo(() => {
   const user: User = useSession();
-  const theme: Theme = useTheme();
+  const classes = useStyles();
 
   const reducer = (state, payload) => ({ ...state, ...payload });
   const [state, dispatch] = useReducer(reducer, {
@@ -38,9 +36,6 @@ const ClipBoardCopy = memo(() => {
 
   return (
     <Tooltip
-      // open
-
-      PopperProps={{}}
       arrow
       placement="bottom"
       open={state.copied}
@@ -58,24 +53,20 @@ const ClipBoardCopy = memo(() => {
             padding: 10,
           },
           endAdornment: (
-            // <InputAdornment position="end">
-
             <CopyToClipboard
               text={state.value}
               onCopy={() => dispatch({ copied: true })}
             >
               {!state.copied ? (
-                <StyledAssignmentOutlinedIcon
-                  secondary={theme.palette.secondary.main}
+                <AssignmentOutlined
+                  className={classes.assignmentOutlinedIcon}
                 />
               ) : (
-                <StyledAssignmentTurnedInOutlinedIcon
-                  primary={theme.palette.primary.main}
+                <AssignmentTurnedInOutlined
+                  className={classes.assignmentTurnedInOutlinedIcon}
                 />
               )}
             </CopyToClipboard>
-
-            // </InputAdornment>
           ),
         }}
       />

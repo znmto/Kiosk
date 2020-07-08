@@ -5,7 +5,7 @@ import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import { SupervisorAccount, Favorite } from "@material-ui/icons";
 import styled from "styled-components";
 import { Grid, Typography } from "@material-ui/core";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme, Theme } from "@material-ui/core/styles";
 import { useSession } from "../Helpers/CustomHooks";
 import firebase from "../FirebaseConfig";
 import { FIREBASE_GET_USER_URL } from "../Constants/api";
@@ -17,7 +17,7 @@ const Home: React.FC = (props) => {
   // const reducer = (state, payload) => ({ ...state, ...payload });
   // const [state, dispatch] = useReducer(reducer, { friends: []});
 
-  const theme = useTheme();
+  const theme: Theme = useTheme();
   const user: User = useSession();
   let history = useHistory();
 

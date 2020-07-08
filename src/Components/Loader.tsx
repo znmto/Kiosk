@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default (_) => {
-  const theme = useTheme();
+  const theme: Theme = useTheme();
   const classes = useStyles(theme);
   return (
     <div className={classes.root}>

@@ -11,13 +11,18 @@ import { User } from "firebase";
 export const UserContext = createContext({ user: {} as User });
 export const SelectionContext = createContext({});
 
-export const useSession = () => {
+export const useSession = (): User => {
   const { user } = useContext(UserContext);
   return user;
 };
 
-export const useAuth = () => {
-  const [state, setState] = useState(() => {
+type UseAuthState = {
+  initializing: boolean;
+  user: User | null;
+};
+
+export const useAuth = (): UseAuthState => {
+  const [state, setState] = useState<UseAuthState>(() => {
     const user = firebase.auth().currentUser;
     return { initializing: !user, user };
   });

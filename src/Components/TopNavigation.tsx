@@ -9,15 +9,15 @@ import { HOME, ACTIVITY } from "../Constants/routes";
 import { LOGIN } from "../Constants/routes";
 import firebase from "../FirebaseConfig";
 import { useSession, SelectionContext } from "../Helpers/CustomHooks";
-import { useTheme } from "@material-ui/core/styles";
+import { useTheme, Theme } from "@material-ui/core/styles";
 import logo from "../images/logo.png";
 import { User } from "firebase";
 import isEmpty from "lodash/isEmpty";
 
-interface StyleProps {
+type StyleProps = {
   secondary?: string;
   primary?: string;
-}
+};
 
 const StyledAccountButtonWrapper = styled.div`
   position: relative;
@@ -83,22 +83,24 @@ const StyledTitle = styled(Typography)`
   cursor: pointer;
 `;
 
-const TopNav: React.FC = (props) => {
+const TopNav: React.FC = () => {
   const history = useHistory();
   const user: User = useSession();
-  const theme = useTheme();
+  const theme: Theme = useTheme();
   const { metadata }: any = useContext(SelectionContext);
-  const handleProfileClick = () => {
+  const handleProfileClick = (): void => {
     // if session, redirect to account
     // else redirect to login
     history.push(user ? ACTIVITY : LOGIN);
   };
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     try {
       firebase.auth().signOut();
-    } catch (error) {}
-    // else redirect to login
-    history.push(LOGIN);
+    } catch (error) {
+      console.log("handleLogout error", error);
+    } finally {
+      history.push(LOGIN);
+    }
   };
   return (
     <StyledTopNavigation>
