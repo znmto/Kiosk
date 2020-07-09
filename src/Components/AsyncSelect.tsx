@@ -7,13 +7,7 @@ import {
   Link,
   Typography,
 } from "@material-ui/core";
-import React, {
-  ReactElement,
-  memo,
-  useState,
-  useContext,
-  useEffect,
-} from "react";
+import React, { ReactElement, memo, useContext } from "react";
 import { SelectionContext, useSession } from "../Helpers/CustomHooks";
 import { Theme, useTheme } from "@material-ui/core/styles";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
@@ -54,7 +48,8 @@ const StyledMediaSelectorWrapper = styled.div`
   align-content: center;
   justify-content: center;
   img {
-    max-width: 200px;
+    border-radius: 6px;
+    max-width: 180px;
     margin: 0 auto;
   }
 `;
@@ -111,7 +106,7 @@ const StlyedActionIcon = styled.div`
   margin: 0 auto;
   cursor: pointer;
   svg {
-    font-size: 32px;
+    font-size: 28px;
   }
 `;
 
@@ -127,6 +122,7 @@ const StyledExternalLinkIconContainer = styled(StlyedActionIcon)`
 
 type AdditionalAsyncSelectProps = {
   publicUserId?: string;
+  loading: boolean;
 };
 type AsyncSelectProps = Media & AdditionalAsyncSelectProps;
 
@@ -148,6 +144,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       additionalRequest,
       publicUserId,
       ratingSource,
+      loading,
     } = props;
 
     const theme: Theme = useTheme();
@@ -159,8 +156,6 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       SelectionContext
     );
     const selected = selections[firestoreKey] || {};
-
-    const [loading, setLoading] = useState<boolean>(false);
 
     const updateMatchesInDb = async (optionCopy) => {
       try {
@@ -316,6 +311,10 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
     };
 
     const getDecription = (): ReactElement => {
+      const StyledSubtitle = styled(Typography)`
+        margin-left: 10px !important;
+      `;
+
       const StyledRatingSourceIconWrapper = styled.div`
         display: inline-block;
         margin-left: 15px;
@@ -323,6 +322,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
           width: 50px;
         }
       `;
+
       const {
         value: { title = "", subtitle = "", id = "", rating = null } = {},
       } = selected;
@@ -330,7 +330,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       if (!isEmpty(selected)) {
         return (
           <StyledDescriptionContainer>
-            <Typography variant="h5">
+            <Typography variant="h5" display="inline">
               <Link
                 style={{ cursor: publicUserId ? "initial" : "pointer" }}
                 onClick={() =>
@@ -340,7 +340,9 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
                 {title}
               </Link>
             </Typography>
-            <Typography variant="body1">{subtitle}</Typography>
+            <StyledSubtitle paragraph variant="body1" display="inline">
+              ({subtitle})
+            </StyledSubtitle>
             {rating && (
               <>
                 <Grid container direction="column">
@@ -349,7 +351,6 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
                       name="read-only"
                       value={rating}
                       precision={0.1}
-                      size="large"
                       readOnly
                     />
                   </Grid>
@@ -410,47 +411,6 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       });
     };
 
-    useEffect(() => {
-      setLoading(true);
-      if (publicUserId) {
-        const publicUserRes = firebase
-          .firestore()
-          .collection("users")
-          .doc(publicUserId)
-          .get()
-          .then((doc) => {
-            if (isEmpty(metadata.publicUser) && doc.data()) {
-              const {
-                metadata: { avatar, fullName },
-              } = doc.data()!;
-              setMetadata({ publicUser: { fullName, avatar } });
-            }
-            const selected = doc.data() && doc.data()![firestoreKey];
-            return setSelection({ [firestoreKey]: selected });
-          })
-          .catch((e) => console.log("get public user error", e))
-          .finally(() => setLoading(false));
-      } else if (user?.uid) {
-        const listener = firebase
-          .firestore()
-          .collection("users")
-          .doc(user?.uid)
-          .onSnapshot((doc) => {
-            console.log("doc", doc.data());
-            if (isEmpty(metadata.user) && doc.data()) {
-              const {
-                metadata: { avatar, fullName },
-              } = doc.data()!;
-              setMetadata({ user: { fullName, avatar } });
-            }
-            const selected = doc.data() && doc.data()![firestoreKey];
-            setLoading(false);
-            return setSelection({ [firestoreKey]: selected });
-          });
-        // unsubscribe listener
-        return () => listener();
-      }
-    }, [firestoreKey, user, publicUserId]);
     return (
       <StyledMediaSelectorWrapper
         quadrant={quadrant}
