@@ -3,7 +3,8 @@ const admin = require("firebase-admin");
 const express = require("express");
 
 const app = express();
-// Add headers
+
+// resolve any uexpected CORS issues
 app.use(function (req, res, next) {
   const allowedOrigins = ["http://localhost:3000", "https://majora-563d6.web.app"];
   if (allowedOrigins.indexOf(req.headers.origin) !== -1) {
@@ -25,7 +26,7 @@ app.get("/getUsersById", (req, res) => {
     )
   );
   Promise.all(promises)
-    .then(values => res.json(values))
+    .then(values => res.status(200).json(values))
     .catch(error => res.status(500).json({ error: error.toString() }));
 });
 
@@ -34,31 +35,7 @@ app.get("/getUserByEmail", (req, res) => {
   admin
     .auth()
     .getUserByEmail(email)
-    .then(({ uid }) => {
-      const response = { email, uid };
-      return res.contentType("application/json").status(200).json(response);
-    })
-    .catch(error => res.status(500).json({ error: error.toString() }));
-});
-
-app.post("/addFriend", (req, res) => {
-  const { email, currentUserUid } = req.body;
-  const user = { email };
-  const getUser = admin.auth().getUserByEmail(user.email);
-  getUser
-    .then(({ uid }) => (user.uid = uid))
-    .then(async something => {
-      // TODO: fix this noob code
-      const fields = await admin.firestore.collection("users").doc(currentUserUid);
-      const existingFriends = fields.friends;
-      const updatedFriends = existingFriends.concat(user);
-      // TODO: fix this noob code
-      await fields.update({
-        friends: updatedFriends,
-      });
-      return updatedFriends;
-    })
-    .then(updatedFriends => res.status(200).json(updatedFriends))
+    .then(({ uid }) => res.status(200).json({ email, uid }))
     .catch(error => res.status(500).json({ error: error.toString() }));
 });
 

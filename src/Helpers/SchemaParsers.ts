@@ -3,6 +3,7 @@ import {
   GoogleBooksArr,
   IGDBGameArr,
 } from "../Types/ApiResponses";
+import { round } from "lodash";
 
 interface ParsedData<T> {
   label: string;
@@ -33,12 +34,13 @@ type IGDBParsedData = {
   cover: number;
   url: string;
   type: string;
-  rating: string;
+  rating: number;
 };
 
 export const omdbSchemaParser = (
   apiResponse: OMDBMovieArr
 ): ParsedData<OMDBParsedData>[] => {
+  console.log("apiResponse.Search", apiResponse.Search);
   return apiResponse.Search.map(
     ({
       Title: title = "",
@@ -55,7 +57,7 @@ export const omdbSchemaParser = (
         subtitle,
         image,
         type,
-        rating: parseFloat(imdbRating),
+        rating: imdbRating && round(imdbRating, 1),
       },
     })
   );
@@ -97,7 +99,14 @@ export const igdbSchemaParser = (
 ): ParsedData<IGDBParsedData>[] => {
   console.log("apiResponse", apiResponse);
   return apiResponse.map(
-    ({ id, name: title, first_release_date = 0, cover = 0, url, rating }) => ({
+    ({
+      id,
+      name: title,
+      first_release_date = 0,
+      cover = 0,
+      url,
+      rating = 0,
+    }) => ({
       label: `${title}`,
       value: {
         id,
@@ -106,7 +115,7 @@ export const igdbSchemaParser = (
         cover,
         type: "game",
         url,
-        rating: rating ? (rating / 20).toFixed(1) : "",
+        rating: rating && round(rating / 20, 1),
       },
     })
   );

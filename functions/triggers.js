@@ -11,7 +11,7 @@ exports.authOnCreate = functions.auth.user().onCreate(async user => {
     .set({
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       metadata: {
-        avatar: `https://avatars.dicebear.com/api/human/${user.uid}.svg`,
+        avatar: `https://api.adorable.io/avatars/75/${user.uid}.png`,
         email: user.email,
         displayName: user.displayName,
       },
@@ -19,6 +19,7 @@ exports.authOnCreate = functions.auth.user().onCreate(async user => {
       tvShow: {},
       game: {},
       book: {},
+      // feature idea
       friends: [],
     });
 });

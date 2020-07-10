@@ -18,8 +18,8 @@ exports.cors = functions.https.onRequest((req, res) => {
       },
       data,
     })
-      .then(({ status, data }) => {
-        if (status === 200) res.status(200).send(data);
+      .then(({ status, data: response }) => {
+        if (status === 200) res.status(200).send(response);
       })
       .catch(error => console.log("error", error.response.status, error.response.statusText, error.response.data));
   });

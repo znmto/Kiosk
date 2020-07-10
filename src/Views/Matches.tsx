@@ -57,6 +57,7 @@ const Matches: React.FC = (props) => {
 
   useEffect(() => {
     if (user?.uid && !isEmpty(selections.game)) {
+      console.log("selections", selections);
       const getSetUsersThatHaveSelected = () => {
         Promise.all(
           media.map((k) => {
@@ -67,6 +68,7 @@ const Matches: React.FC = (props) => {
               .doc(selections![k.firestoreKey]?.id)
               .get()
               .then((doc) => {
+                console.log("doc", doc.data());
                 const stateCopy = state.usersThatHaveSelected;
                 stateCopy[k.firestoreKey] = doc.data()!.currentlySelectedBy;
                 return dispatch({

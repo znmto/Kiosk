@@ -132,6 +132,29 @@ const SignupOrLogin = (props) => {
     }
   };
 
+  const SAMPLE_LOGINS = [
+    {
+      email: "test@example.com",
+      password: "test123",
+    },
+    {
+      email: "test1@example.com",
+      password: "test123",
+    },
+    {
+      email: "test2@example.com",
+      password: "test123",
+    },
+    {
+      email: "test3@example.com",
+      password: "test123",
+    },
+    {
+      email: "test4@example.com",
+      password: "test123",
+    },
+  ];
+
   return (
     <Suspense fallback={<h1>LOADING</h1>}>
       <Container component="main" maxWidth="xs">
@@ -147,38 +170,25 @@ const SignupOrLogin = (props) => {
                   (click to prefill form)
                 </Typography>
                 <List component="nav" aria-label="main mailbox folders">
-                  <ListItem
-                    button
-                    onClick={() => {
-                      setEmail("test@example.com");
-                      setPassword("test123");
-                    }}
-                  >
-                    <ListItemIcon>
-                      {email === "test@example.com" ? (
-                        <LockIcon htmlColor={theme.palette.success.main} />
-                      ) : (
-                        <LockOpenIcon />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText primary="test@example.com / test123" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={() => {
-                      setEmail("test1@example.com");
-                      setPassword("test123");
-                    }}
-                  >
-                    <ListItemIcon>
-                      {email === "test1@example.com" ? (
-                        <LockIcon htmlColor={theme.palette.success.main} />
-                      ) : (
-                        <LockOpenIcon />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText primary="test1@example.com / test123" />
-                  </ListItem>
+                  {SAMPLE_LOGINS.map((l, i) => (
+                    <ListItem
+                      key={i}
+                      button
+                      onClick={() => {
+                        setEmail(l.email);
+                        setPassword(l.password);
+                      }}
+                    >
+                      <ListItemIcon>
+                        {email === `${l.email}` ? (
+                          <LockIcon htmlColor={theme.palette.success.main} />
+                        ) : (
+                          <LockOpenIcon />
+                        )}
+                      </ListItemIcon>
+                      <ListItemText primary={`${l.email} / ${l.password}`} />
+                    </ListItem>
+                  ))}
                 </List>
               </CardContent>
             </Card>

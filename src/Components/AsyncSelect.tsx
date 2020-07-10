@@ -23,7 +23,7 @@ import { User } from "firebase";
 import axios from "axios";
 import debounce from "debounce-promise";
 import firebase from "../FirebaseConfig";
-import isEmpty from "lodash/isEmpty";
+import { isEmpty, round } from "lodash";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 
@@ -47,7 +47,7 @@ const StyledMediaSelectorWrapper = styled.div`
   height: calc((100vh - 320px) / 2);
   align-content: center;
   justify-content: center;
-  img {
+  img.media-cover {
     border-radius: 6px;
     max-width: 180px;
     margin: 0 auto;
@@ -152,9 +152,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
     const history = useHistory();
     const firestore = firebase.firestore();
 
-    const { selections, setSelection, setMetadata, metadata }: any = useContext(
-      SelectionContext
-    );
+    const { selections, metadata }: any = useContext(SelectionContext);
     const selected = selections[firestoreKey] || {};
 
     const updateMatchesInDb = async (optionCopy) => {
@@ -217,8 +215,10 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             const additionalResponse = await augmentWithAdditionalRequest({
               customUrl: `${additionalRequestUrl}&i=${optionCopy?.value[matchFieldName]}`,
             });
-            const normalizedRating =
-              parseFloat(additionalResponse?.imdbRating) / 2;
+            const normalizedRating = round(
+              parseFloat(additionalResponse?.imdbRating) / 2,
+              1
+            );
             optionCopy.value.rating = normalizedRating;
           }
         }
@@ -306,7 +306,8 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
 
     const getImage = (): ReactElement => {
       const { value: { image = "" } = {} } = selected;
-      if (!isEmpty(selected)) return <img alt="media-cover" src={image} />;
+      if (!isEmpty(selected))
+        return <img className="media-cover" alt="media-cover" src={image} />;
       return <></>;
     };
 
