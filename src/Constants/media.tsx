@@ -29,7 +29,7 @@ export const media: Media[] = [
   {
     label: "Movie",
     icon: <Theaters />,
-    quadrant: [1, 1],
+    quadrant: [1, 1], // I may have overthought this approach, but it works
     url: `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&type=movie`,
     method: "GET",
     headers: {
@@ -39,12 +39,14 @@ export const media: Media[] = [
     schemaParser: omdbSchemaParser,
     firestoreKey: MOVIE,
     additionalRequest: omdbAdditionalRequest,
-    externalUrlFormatter: (interpolatable): string =>
+    externalUrlFormatter: (
+      interpolatable
+    ): string =>  // format an external link to IMDB for this movie
       `https://imdb.com/title/${interpolatable?.value?.id}`,
     ratingSource: {
       icon: imdbLogo,
       name: "IMDB",
-      normalized: true,
+      normalized: true, // incoming rating is not /5
     },
   },
   {
@@ -60,12 +62,14 @@ export const media: Media[] = [
     schemaParser: omdbSchemaParser,
     firestoreKey: TV_SHOW,
     additionalRequest: omdbAdditionalRequest,
-    externalUrlFormatter: (interpolatable): string =>
+    externalUrlFormatter: (
+      interpolatable
+    ): string =>  // format an external link to IMDB for this tv show
       `https://imdb.com/title/${interpolatable?.value?.id}`,
     ratingSource: {
       icon: imdbLogo,
       name: "IMDB",
-      normalized: true,
+      normalized: true, // incoming rating is not /5
     },
   },
   {
@@ -82,8 +86,7 @@ export const media: Media[] = [
     firestoreKey: BOOK,
     externalUrlFormatter: (interpolatable): string => {
       const isbn = interpolatable?.value?.isbn13;
-      // AMAZON REFERRAL
-      const refCode = "";
+      const refCode = ""; // Amazon Referral? MONETIZATION!!!
       return `https://amazon.com/s?k=${isbn}&ref=${refCode}`;
     },
     ratingSource: {
@@ -105,6 +108,7 @@ export const media: Media[] = [
     schemaParser: igdbSchemaParser,
     firestoreKey: GAME,
     dataFormatter: (interpolatable: string): string => {
+      // we need to format the input value  in a specific way for this api call
       const prefix: string = "search ";
       const postfix: string = " fields *;";
       return `${prefix}"${interpolatable}";${postfix}`;
@@ -124,7 +128,7 @@ export const media: Media[] = [
     ratingSource: {
       icon: igdbLogo,
       name: "IGDB (Twitch)",
-      normalized: true,
+      normalized: true, // incoming rating is not /5
     },
   },
 ];

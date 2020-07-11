@@ -1,6 +1,10 @@
 import React, { useReducer, useEffect, useContext } from "react";
 import { Grid, makeStyles, Theme, Paper, Typography } from "@material-ui/core";
-import { useSession, SelectionContext } from "../Helpers/CustomHooks";
+import {
+  useSession,
+  SelectionContext,
+  FirestoreContext,
+} from "../Helpers/CustomHooks";
 import firebase from "../FirebaseConfig";
 import { User } from "firebase";
 import { media } from "../Constants/media";
@@ -48,7 +52,7 @@ const Matches: React.FC = (props) => {
   const classes = useStyles();
   const user: User = useSession();
   const params = useParams<MatchesParams>();
-  const { selections }: any = useContext(SelectionContext);
+  const { selections = {} }: FirestoreContext = useContext(SelectionContext);
 
   const reducer = (state, payload) => ({ ...state, ...payload });
   const [state, dispatch] = useReducer(reducer, {

@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React from "react";
 
 export type AdditionalRequest = {
   description?: string;
@@ -25,8 +25,8 @@ export type Media = {
   data?: any;
   dataFormatter?: (arg1: string) => string;
   searchParam?: string;
-  schemaParser: any;
-  icon: ReactElement;
+  schemaParser: (arg1: any) => any;
+  icon: React.ReactElement;
   firestoreKey: string;
   quadrant: number[];
   externalUrlFormatter: (arg1: any) => string;

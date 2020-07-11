@@ -26,6 +26,7 @@ import firebase from "../FirebaseConfig";
 import { isEmpty, round } from "lodash";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
+import { FirestoreContext } from "../Helpers/CustomHooks";
 
 type StyleProps = {
   // x,y location of section in view
@@ -152,16 +153,16 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
     const history = useHistory();
     const firestore = firebase.firestore();
 
-    const { selections, metadata }: any = useContext(SelectionContext);
-    const selected = selections[firestoreKey] || {};
+    const { selections = {}, metadata = {} }: FirestoreContext = useContext(
+      SelectionContext
+    );
+    const selected = selections![firestoreKey] || {};
 
     const updateMatchesInDb = async (optionCopy) => {
       try {
         const mediaCollection = await firestore.collection("media");
         const matchFields = mediaCollection.doc(optionCopy?.id);
-        const {
-          user: { avatar = "", fullName = "" },
-        } = metadata;
+        const { user: { avatar = "", fullName = "" } = {} } = metadata;
         matchFields.get().then((doc) => {
           if (!doc.exists) {
             // add match document if it doesnt exist already
@@ -190,15 +191,15 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       const optionCopy = Object.assign({}, selectedOption, {
         id: `${firestoreKey}-${selectedOption?.value?.id}`,
       });
-      // if we need to make a 2nd call to augment the user selection, do it on change
-      // api specific
       try {
+        // if we need to make a 2nd call to augment the user selection, do it on change without mutating original object
         if (!isEmpty(additionalRequest)) {
           const {
             url: additionalRequestUrl,
             matchFieldName,
           } = additionalRequest!;
           if (firestoreKey === GAME) {
+            // for IGDB we need to fetch cover art in a seperate request
             const additionalResponse = await augmentWithAdditionalRequest({
               customUrl: additionalRequestUrl,
               customBody: `where id = ${optionCopy?.value[matchFieldName]}; fields *;`,
@@ -212,9 +213,11 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             optionCopy.value.image = imageUrl;
           }
           if ([MOVIE, TV_SHOW].includes(firestoreKey)) {
+            // for OMDB we need to fetch rating in a seperate request
             const additionalResponse = await augmentWithAdditionalRequest({
               customUrl: `${additionalRequestUrl}&i=${optionCopy?.value[matchFieldName]}`,
             });
+            // IMDB ratings are out of 10
             const normalizedRating = round(
               parseFloat(additionalResponse?.imdbRating) / 2,
               1
@@ -222,9 +225,8 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             optionCopy.value.rating = normalizedRating;
           }
         }
-        // get user data from DB
+        // grab user document
         const fields = await firestore.collection("users").doc(user.uid);
-
         // update field in DB
         await fields.update({
           [firestoreKey]: optionCopy,
@@ -250,6 +252,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       customBody?: any;
       customUrl: string;
     }) => {
+      // just a simple extra call to our CORS Cloud Function to get additional data when needed
       const { method, headers, description } = props.additionalRequest!;
       try {
         const { data: response } = await axios({
@@ -292,12 +295,12 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
           },
           data: {
             url: parametrizedUrl, // api URL
-            body: postData, // POST body
-            method, // http verb
+            body: postData, // api POST body
+            method, // api verb
             headers,
           },
         });
-        // use custom schema parsing function to manipulate API response data
+        // use individual custom schema parsing function to massage API response data
         return callback(schemaParser(response));
       } catch (error) {
         console.log("callCloudFn error", error);
@@ -396,7 +399,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
     const handleClear = async () => {
       const userFields = await firestore.collection("users").doc(user.uid);
       const matchFields = await firestore.collection("media").doc(selected?.id);
-      //remove uid from media collection
+      // remove user id from media collection
       matchFields.get().then((doc) => {
         if (!doc.exists) return;
         const oldArr = doc.data()!.currentlySelectedBy;

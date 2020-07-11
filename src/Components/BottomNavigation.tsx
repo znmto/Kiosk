@@ -43,10 +43,11 @@ const BottomNav: React.FC<BottomNavProps> = (props: BottomNavProps) => {
 
   const { params: { publicUid = "", showOnly = "" } = {} } =
     (useRouteMatch<MatchesParams | PublicViewParam>({
+      // this component isnt part of a route so we need this hook to grab params
       path: [PUBLIC_ACTIVITY, MATCHES_FILTER],
       exact: true,
       strict: true,
-    }) as any) || {}; // TODO: react-router exposed types incorrect
+    }) as any) || {};
 
   // default view
   const [route, setRoute] = React.useState<string>(location?.pathname);
@@ -84,7 +85,7 @@ const BottomNav: React.FC<BottomNavProps> = (props: BottomNavProps) => {
           icon={<Extension className={classes.bottomNavigationIcon} />}
         />
       )}
-      {publicUid && (
+      {publicUid && ( // different icon on nav bar to indicate this is a public user's selections
         <BottomNavigationAction
           onClick={() => {}}
           label="Public Profile"

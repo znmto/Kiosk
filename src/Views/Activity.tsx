@@ -3,7 +3,7 @@ import axios from "axios";
 import { makeStyles } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles";
 import AsyncSelect from "../Components/AsyncSelect";
-import { useSession } from "../Helpers/CustomHooks";
+import { useSession, FirestoreContext } from "../Helpers/CustomHooks";
 import { FIREBASE_GET_ID_URL } from "../Constants/api";
 import { User } from "firebase";
 import ClipBoardCopy from "../Components/CopyToClipboard";
@@ -50,9 +50,12 @@ const Activity: React.FC<ActivityProps> = memo((props: ActivityProps) => {
   const user: User = useSession();
   const classes = useStyles();
   const history = useHistory();
-  const { selections, setSelection, setMetadata, metadata }: any = useContext(
-    SelectionContext
-  );
+  const {
+    selections = {},
+    setSelection,
+    metadata = {},
+    setMetadata,
+  }: FirestoreContext = useContext(SelectionContext);
 
   const [publicUser, setPublicUser] = useState<PublicUser>();
   const [loading, setLoading] = useState<boolean>(false);

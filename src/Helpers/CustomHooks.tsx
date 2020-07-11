@@ -8,37 +8,10 @@ import React, {
 import firebase from "../FirebaseConfig";
 import { User } from "firebase";
 
-export const UserContext = createContext({ user: {} as User });
-export const SelectionContext = createContext({});
-
-export const useSession = (): User => {
-  const { user } = useContext(UserContext);
-  return user;
-};
-
-type UseAuthState = {
-  initializing: boolean;
-  user: User | null;
-};
-
-export const useAuth = (): UseAuthState => {
-  const [state, setState] = useState<UseAuthState>(() => {
-    const user = firebase.auth().currentUser;
-    return { initializing: !user, user };
-  });
-  const onChange = (user) => {
-    setState({ initializing: false, user });
-  };
-
-  useEffect(() => {
-    // listen for auth state changes
-    const unsubscribe = firebase.auth().onAuthStateChanged(onChange);
-    // unsubscribe to the listener when unmounting
-    return () => unsubscribe();
-  }, []);
-
-  return state;
-};
+export interface FirestoreContext extends FirestoreContextState {
+  setSelection: (arg1: FirestoreContextSelections) => FirestoreContextState;
+  setMetadata: (arg1: FirestoreContextMedatata) => FirestoreContextState;
+}
 
 type ContextMedia = {
   id: string;
@@ -77,8 +50,43 @@ type FirestoreContextState = {
   metadata?: FirestoreContextMedatata;
 };
 
+type UseAuthState = {
+  initializing: boolean;
+  user: User | null;
+};
+
+export const UserContext = createContext({ user: {} as User });
+export const SelectionContext = createContext({} as FirestoreContext);
+
+export const useSession = (): User => {
+  const { user } = useContext(UserContext);
+  return user;
+};
+
+export const useAuth = (): UseAuthState => {
+  const [state, setState] = useState<UseAuthState>(() => {
+    const user = firebase.auth().currentUser;
+    return { initializing: !user, user };
+  });
+  const onChange = (user) => {
+    setState({ initializing: false, user });
+  };
+
+  useEffect(() => {
+    // listen for auth state changes
+    const unsubscribe = firebase.auth().onAuthStateChanged(onChange);
+    // unsubscribe to the listener when unmounting
+    return () => unsubscribe();
+  }, []);
+
+  return state;
+};
+
 export const FirestoreContextProvider = ({ children }) => {
-  const reducer = (
+  const reducer: React.Reducer<
+    FirestoreContextState,
+    FirestoreContextSelections & FirestoreContextMedatata
+  > = (
     state: FirestoreContextState,
     payload: FirestoreContextSelections & FirestoreContextMedatata
   ) => ({
@@ -99,7 +107,14 @@ export const FirestoreContextProvider = ({ children }) => {
   return (
     <>
       <SelectionContext.Provider
-        value={{ selections, setSelection, metadata, setMetadata }}
+        value={
+          {
+            selections,
+            setSelection,
+            metadata,
+            setMetadata,
+          } as any
+        }
       >
         {children}
       </SelectionContext.Provider>
