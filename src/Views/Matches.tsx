@@ -99,9 +99,9 @@ const Matches: React.FC = (props) => {
             item
             key={m.firestoreKey}
             className={
-              !isEmpty(params) &&
-              params.showOnly !== m.firestoreKey &&
-              (classes.hidden as any)
+              !isEmpty(params) && params.showOnly !== m.firestoreKey
+                ? classes.hidden
+                : ""
             }
           >
             <Paper variant="outlined" className={classes.mediaPanel}>

@@ -4,7 +4,7 @@ import {
   googleBooksSchemaParser,
   igdbSchemaParser,
 } from "../Helpers/SchemaParsers";
-import { AdditionalRequest } from "../Types/shared";
+import { AdditionalRequest, InterpolatableObject } from "../Types/shared";
 import { LiveTv, Theaters, SportsEsports, MenuBook } from "@material-ui/icons";
 import imdbLogo from "../images/imdb.png";
 import igdbLogo from "../images/igdb.png";
@@ -63,7 +63,7 @@ export const media: Media[] = [
     firestoreKey: TV_SHOW,
     additionalRequest: omdbAdditionalRequest,
     externalUrlFormatter: (
-      interpolatable
+      interpolatable: InterpolatableObject
     ): string =>  // format an external link to IMDB for this tv show
       `https://imdb.com/title/${interpolatable?.value?.id}`,
     ratingSource: {
@@ -84,7 +84,7 @@ export const media: Media[] = [
     searchParam: "q",
     schemaParser: googleBooksSchemaParser,
     firestoreKey: BOOK,
-    externalUrlFormatter: (interpolatable): string => {
+    externalUrlFormatter: (interpolatable: InterpolatableObject): string => {
       const isbn = interpolatable?.value?.isbn13;
       const refCode = ""; // Amazon Referral? MONETIZATION!!!
       return `https://amazon.com/s?k=${isbn}&ref=${refCode}`;
@@ -123,8 +123,8 @@ export const media: Media[] = [
         Accept: "application/json",
       },
     },
-    externalUrlFormatter: (interpolatable): string =>
-      interpolatable?.value?.url,
+    externalUrlFormatter: (interpolatable: InterpolatableObject): string =>
+      `${interpolatable?.value?.url}`,
     ratingSource: {
       icon: igdbLogo,
       name: "IGDB (Twitch)",

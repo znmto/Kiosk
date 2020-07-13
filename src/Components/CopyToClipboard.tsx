@@ -8,11 +8,6 @@ import {
   AssignmentTurnedInOutlined,
 } from "@material-ui/icons";
 
-type StyleProps = {
-  primary?: string;
-  secondary?: string;
-};
-
 const useStyles = makeStyles((theme: Theme) => ({
   assignmentOutlinedIcon: {
     cursor: "pointer",
@@ -32,16 +27,17 @@ const ClipBoardCopy: React.FC = memo(() => {
   const [state, dispatch] = useReducer(reducer, {
     value: `${window.location.origin}/activity/${user?.uid}`,
     copied: false,
+    showTooltip: false,
   });
 
   return (
     <Tooltip
       arrow
       placement="bottom"
-      open={state.copied}
+      open={state.copied && state.showTooltip}
       title={"Copied to clipboard!"}
       leaveDelay={1500}
-      // onClose={() => dispatch({ showTooltip: false })}
+      onClose={() => dispatch({ showTooltip: false })}
     >
       <TextField
         label="Shareable Link"
@@ -55,7 +51,7 @@ const ClipBoardCopy: React.FC = memo(() => {
           endAdornment: (
             <CopyToClipboard
               text={state.value}
-              onCopy={() => dispatch({ copied: true })}
+              onCopy={() => dispatch({ copied: true, showTooltip: true })}
             >
               {!state.copied ? (
                 <AssignmentOutlined
