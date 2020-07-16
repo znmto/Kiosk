@@ -24,12 +24,13 @@ Firestore expedites development by providing tooling for the database layer and 
 
 ### `To Do`
 
-1. Refactor hacky code.
+1. ~~Refactor hacky code.~~
 2. ~~Implement shareable link for unauthenticated activity sharing.~~
 3. ~~Add Types where missing/broken.~~
 4. ~~Finish UI/UX.~~
 5. ~~Local development walkthrough.~~
-6. Seed DB.
+6. ~~Seed DB.~~
 7. Implement friends and feed functionality. (LT)
+8. Gather feedback.
 
 ### Created using [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), and [Google Firebase](https://firebase.google.com/).
