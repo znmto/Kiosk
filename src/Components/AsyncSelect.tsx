@@ -283,7 +283,12 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       }
       if (!publicUserId) {
         return (
-          <Grid container direction="column" alignItems="center">
+          <Grid
+            container
+            direction="column"
+            alignItems="center"
+            style={{ gridColumn: 2, gridRow: 3 }}
+          >
             <Grid item>
               <Typography variant="h5">{`Search for a ${label} below`}</Typography>
             </Grid>
@@ -323,7 +328,16 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
         primary={theme.palette.primary.main}
       >
         {loading ? (
-          <CircularProgress style={{ color: "#325247" }} size={60} />
+          <CircularProgress
+            style={{
+              color: "#325247",
+              gridColumn: 2,
+              gridRow: 3,
+              justifySelf: "center",
+              alignSelf: "center",
+            }}
+            size={60}
+          />
         ) : (
           <>
             <StyledActionIconsContainer>

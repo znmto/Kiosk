@@ -17,14 +17,19 @@ export const StyledArrowDownwardIcon = styled(ArrowDownwardIcon)`
 
 export const StyledMediaSelectorWrapper = styled.div`
   display: grid;
-  grid-column: ${({ quadrant = [] }: StyleProps) => quadrant[0]};
-  grid-row: ${({ quadrant = [] }: StyleProps) => quadrant[1]};
+  /* grid-column: ${({ quadrant = [] }: StyleProps) => quadrant[0]};
+  grid-row: ${({ quadrant = [] }: StyleProps) => quadrant[1]}; */
+  grid-template-columns: 1fr 70% 1fr;
+  grid-template-rows: repeat(5, 1fr);
+  /* grid-template-rows: 7% 1fr 1fr 1fr 7%; */
   height: calc((100vh - 320px) / 2);
   align-content: center;
   justify-content: center;
   img.media-cover {
+    grid-column: 2;
+    grid-row: 3;
     border-radius: 6px;
-    max-width: 180px;
+    height: 250px;
     margin: 0 auto;
   }
 `;
@@ -35,8 +40,18 @@ export const StyledIconWrapper = styled.div`
   }
   color: ${(props: StyleProps) => props.primary};
   display: grid;
-  position: absolute;
+  /* padding: 30px; */
   ${({ quadrant = [] }: StyleProps): string => {
+    const borderCommon = `1px solid #eee`;
+    const quadStyleMap = {
+      "1,1": `align-items: center; justify-content: center; grid-row: 5; grid-column: 3; border-bottom: ${borderCommon}; border-right: ${borderCommon};`,
+      "1,2": `align-items: center; justify-content: center; grid-row: 1; grid-column: 3; border-top: ${borderCommon}; border-right: ${borderCommon};`,
+      "2,1": `align-items: center; justify-content: center; grid-row: 5; grid-column: 1; border-bottom: ${borderCommon}; border-left: ${borderCommon}; `,
+      "2,2": `align-items: center; justify-content: center; grid-row: 1; grid-column: 1; border-top: ${borderCommon}; border-left: ${borderCommon}; `,
+    };
+    return quadStyleMap[quadrant.join()];
+  }};
+  /* ${({ quadrant = [] }: StyleProps): string => {
     const borderCommon = `1px solid #eee`;
     const quadStyleMap = {
       "1,1": `justify-self: end;
@@ -49,7 +64,7 @@ export const StyledIconWrapper = styled.div`
         align-self: start; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 40px 120px 120px 40px`,
     };
     return quadStyleMap[quadrant.join()];
-  }};
+  }}; */
 `;
 
 export const StyledLoader = styled(LinearProgress)`
@@ -58,10 +73,15 @@ export const StyledLoader = styled(LinearProgress)`
 `;
 export const StyledAsyncSelectWrapper = styled.div`
   width: 300px;
+  grid-column: 2;
+  grid-row: 4;
+  justify-self: center;
 `;
 export const StyledDescriptionContainer = styled.div`
   text-align: center;
   margin-top: 15px;
+  grid-column: 2;
+  grid-row: 4;
   & a {
     text-decoration: none;
     color: unset;
@@ -70,14 +90,18 @@ export const StyledDescriptionContainer = styled.div`
 
 export const StyledActionIconsContainer = styled.div`
   display: grid;
+  grid-column: 2;
+  grid-row: 2;
   justify-content: center;
+  align-self: end;
+  height: 50px;
   > div {
     margin: 0 10px;
   }
 `;
 
 export const StlyedActionIcon = styled.div`
-  grid-row: 1;
+  grid-row: 2;
   margin: 0 auto;
   cursor: pointer;
   svg {
