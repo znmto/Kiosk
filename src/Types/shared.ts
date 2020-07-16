@@ -1,3 +1,4 @@
+import { OMDBMovieArr, GoogleBooksArr, IGDBGameArr } from "./ApiResponses";
 import React from "react";
 
 type Headers = {
@@ -37,6 +38,38 @@ export type PublicViewParam = {
   publicUid?: string;
 };
 
+export type ParsedData<T> = {
+  label: string;
+  value: T;
+};
+
+export type OMDBParsedData = {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  type: string;
+  rating: number;
+};
+export type GoogleBooksParsedData = {
+  id: string;
+  isbn13?: string;
+  title: string;
+  subtitle: string;
+  image?: string;
+  type: string;
+  rating: number;
+};
+export type IGDBParsedData = {
+  id: number;
+  title: string;
+  subtitle: number;
+  cover: number;
+  url: string;
+  type: string;
+  rating: number;
+};
+
 export type Media = {
   label: string;
   url: string;
@@ -45,7 +78,7 @@ export type Media = {
   data?: any;
   dataFormatter?: (arg1: string) => string;
   searchParam?: string;
-  schemaParser: (arg1: any) => any;
+  schemaParser: (arg1: any) => any; // I would love to dynamically type arg1 (and the return value) but it changes depending on which object in the media array (media.tsx) this property is on. Union types don't seem to work here.
   icon: React.ReactElement;
   firestoreKey: string;
   quadrant: number[];

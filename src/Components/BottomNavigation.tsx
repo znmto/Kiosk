@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -8,9 +8,7 @@ import {
 import { Favorite, Face, Extension } from "@material-ui/icons";
 import { useRouteMatch, useLocation, useHistory } from "react-router-dom";
 import {
-  HOME,
   ACTIVITY,
-  FRIENDS,
   MATCHES,
   MATCHES_FILTER,
   PUBLIC_ACTIVITY,
@@ -50,7 +48,7 @@ const BottomNav: React.FC<BottomNavProps> = (props: BottomNavProps) => {
     }) as any) || {};
 
   // default view
-  const [route, setRoute] = React.useState<string>(location?.pathname);
+  const [route, setRoute] = useState<string>(location?.pathname);
 
   const navigate = (route: string): void => history.push(route);
 

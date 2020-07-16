@@ -4,43 +4,16 @@ import {
   IGDBGameArr,
 } from "../Types/ApiResponses";
 import { round } from "lodash";
-
-interface ParsedData<T> {
-  label: string;
-  value: T;
-}
-
-type OMDBParsedData = {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: string;
-  type: string;
-  rating: number;
-};
-type GoogleBooksParsedData = {
-  id: string;
-  isbn13?: string;
-  title: string;
-  subtitle: string;
-  image?: string;
-  type: string;
-  rating: number;
-};
-type IGDBParsedData = {
-  id: number;
-  title: string;
-  subtitle: number;
-  cover: number;
-  url: string;
-  type: string;
-  rating: number;
-};
+import {
+  OMDBParsedData,
+  GoogleBooksParsedData,
+  IGDBParsedData,
+  ParsedData,
+} from "../Types/shared";
 
 export const omdbSchemaParser = (
   apiResponse: OMDBMovieArr
 ): ParsedData<OMDBParsedData>[] => {
-  console.log("apiResponse.Search", apiResponse.Search);
   return apiResponse.Search.map(
     ({
       Title: title = "",
@@ -97,7 +70,6 @@ export const googleBooksSchemaParser = (
 export const igdbSchemaParser = (
   apiResponse: IGDBGameArr
 ): ParsedData<IGDBParsedData>[] => {
-  console.log("apiResponse", apiResponse);
   return apiResponse.map(
     ({
       id,

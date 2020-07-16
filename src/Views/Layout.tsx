@@ -33,7 +33,7 @@ const theme: Theme = createMuiTheme({
   typography: {
     fontFamily: "'Roboto', sans-serif",
   },
-} as any);
+});
 
 const Layout: React.FC = ({ children }) => {
   return (

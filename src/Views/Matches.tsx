@@ -1,5 +1,13 @@
 import React, { useReducer, useEffect, useContext } from "react";
-import { Grid, makeStyles, Theme, Paper, Typography } from "@material-ui/core";
+import {
+  Grid,
+  makeStyles,
+  Theme,
+  Paper,
+  Typography,
+  Link,
+  Avatar,
+} from "@material-ui/core";
 import {
   useSession,
   SelectionContext,
@@ -10,8 +18,6 @@ import { User } from "firebase";
 import { media } from "../Constants/media";
 import isEmpty from "lodash/isEmpty";
 import { useParams } from "react-router-dom";
-import Avatar from "@material-ui/core/Avatar";
-import Link from "@material-ui/core/Link";
 import { MatchesParams } from "../Types/shared";
 import { Media } from "../Types/shared";
 
@@ -46,6 +52,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: 300,
     textAlign: "center",
   },
+  disabledLink: {
+    pointerEvents: "none",
+  },
 }));
 
 const Matches: React.FC = (props) => {
@@ -61,7 +70,6 @@ const Matches: React.FC = (props) => {
 
   useEffect(() => {
     if (user?.uid && !isEmpty(selections.game)) {
-      console.log("selections", selections);
       const getSetUsersThatHaveSelected = () => {
         Promise.all(
           media.map((k) => {
@@ -72,7 +80,6 @@ const Matches: React.FC = (props) => {
               .doc(selections![k.firestoreKey]?.id)
               .get()
               .then((doc) => {
-                console.log("doc", doc.data());
                 const stateCopy = state.usersThatHaveSelected;
                 stateCopy[k.firestoreKey] = doc.data()!.currentlySelectedBy;
                 return dispatch({
@@ -84,7 +91,7 @@ const Matches: React.FC = (props) => {
       };
       getSetUsersThatHaveSelected();
     }
-  }, [selections]);
+  }, [selections, user]);
 
   return (
     <Grid
@@ -114,6 +121,8 @@ const Matches: React.FC = (props) => {
               <Grid container justify="center" direction="column">
                 {mediaMatches ? (
                   mediaMatches.map(({ id, email, avatar, fullName }) => {
+                    const displayEmail: string =
+                      user?.uid === id ? `${email} (you)` : email;
                     return (
                       <Grid container item alignItems="center">
                         <Avatar
@@ -122,11 +131,14 @@ const Matches: React.FC = (props) => {
                           src={avatar}
                         />
                         <Link
+                          className={
+                            user?.uid === id ? classes.disabledLink : ""
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           href={`${window.location.origin}/activity/${id}`}
                         >
-                          {email}
+                          {displayEmail}
                         </Link>
                       </Grid>
                     );

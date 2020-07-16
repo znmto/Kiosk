@@ -10,6 +10,11 @@ import imdbLogo from "../images/imdb.png";
 import igdbLogo from "../images/igdb.png";
 import googleBooksLogo from "../images/googlebooks.png";
 import { Media } from "../Types/shared";
+import {
+  OMDBMovieArr,
+  GoogleBooksArr,
+  IGDBGameArr,
+} from "../Types/ApiResponses";
 export const MOVIE = "movie";
 export const TV_SHOW = "tvShow";
 export const GAME = "game";

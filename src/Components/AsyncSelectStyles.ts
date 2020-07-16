@@ -50,7 +50,7 @@ export const StyledIconWrapper = styled.div`
     };
     return quadStyleMap[quadrant.join()];
   }};
-` as any;
+`;
 
 export const StyledLoader = styled(LinearProgress)`
   margin: 0 auto;

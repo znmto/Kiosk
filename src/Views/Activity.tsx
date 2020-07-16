@@ -106,8 +106,6 @@ const Activity: React.FC<RouteComponentProps<MatchParams>> = memo(
           .catch((e) => console.log("get public user error", e))
           .finally(() => setLoading(false));
       } else if (user?.uid) {
-        console.log("selections, metadata", selections, metadata);
-        console.log("user", user);
         // get user's selections and persist in ctx and add listener for changes
         const listener = firebase
           .firestore()
@@ -115,7 +113,6 @@ const Activity: React.FC<RouteComponentProps<MatchParams>> = memo(
           .doc(user?.uid)
           .onSnapshot(
             (doc) => {
-              console.log("doc.data()", doc.data());
               if (doc.data()) {
                 if (isEmpty(metadata.user)) {
                   const {

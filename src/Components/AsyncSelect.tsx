@@ -375,7 +375,6 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             <StyledIconWrapper
               primary={theme.palette.primary.main}
               quadrant={quadrant}
-              alt={label}
             >
               {icon}
             </StyledIconWrapper>
