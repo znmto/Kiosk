@@ -73,6 +73,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
 
     const updateMatchesInDb = async (optionCopy) => {
       try {
+        console.log("optionCopy", optionCopy);
         const mediaCollection = await firestore.collection("media");
         const matchFields = mediaCollection.doc(optionCopy?.id);
         const { user: { avatar = "", fullName = "" } = {} } = metadata;
@@ -144,11 +145,11 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
         await fields.update({
           [firestoreKey]: optionCopy,
         });
+
+        return updateMatchesInDb(optionCopy);
       } catch (error) {
         console.log("handleOnChange error", error);
       }
-
-      updateMatchesInDb(optionCopy);
     };
 
     const handleOnFocus = (_) => console.log("onFocus"); // for later use
