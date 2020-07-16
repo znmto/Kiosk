@@ -24,6 +24,8 @@ Firestore expedites development by providing tooling for the database layer and 
 
 ### `To Do`
 
+0. ### Fix Chrome CSS issues (FF is ok...)
+
 1. ~~Refactor hacky code.~~
 2. ~~Implement shareable link for unauthenticated activity sharing.~~
 3. ~~Add Types where missing/broken.~~
