@@ -1,7 +1,7 @@
 ## Kiosk
 
 <p align="center">
-A live version of this project can be found <a target="blank" rel="noopener noreferrer" href="https://majora-563d6.web.app/">here</a>. Best viewed on FireFox for now.
+A live version of this project can be found <a target="blank" rel="noopener noreferrer" href="https://majora-563d6.web.app/">here</a>.
 </p>
 
 ### `Architecture`
@@ -23,8 +23,6 @@ Using a Cloud Function as a gateway allows us to bypass CORS issues and listen f
 Firestore expedites development by providing tooling for the database layer and deep integration with client-side JavaScript frameworks.
 
 ### `To Do`
-
-0. ### Fix Chrome CSS issues (FF is ok...)
 
 1. ~~Refactor hacky code.~~
 2. ~~Implement shareable link for unauthenticated activity sharing.~~
