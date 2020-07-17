@@ -34,19 +34,15 @@ export const StyledIconWrapper = styled.div`
     font-size: 32px;
   }
   color: ${(props: StyleProps) => props.primary};
-  display: grid;
   position: absolute;
+  text-align: center;
   ${({ quadrant = [] }: StyleProps): string => {
     const borderCommon = `1px solid #eee`;
     const quadStyleMap = {
-      "1,1": `justify-self: end;
-        align-self: end; border-bottom: ${borderCommon}; border-right: ${borderCommon}; padding: 120px 40px 40px 120px`,
-      "1,2": `justify-self: end;
-        align-self: start; border-top: ${borderCommon}; border-right: ${borderCommon}; padding: 40px 40px 120px 120px`,
-      "2,1": `justify-self: start;
-        align-self: end; border-bottom: ${borderCommon}; border-left: ${borderCommon}; padding: 120px 120px 40px 40px`,
-      "2,2": `justify-self: start;
-        align-self: start; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 40px 120px 120px 40px`,
+      "1,1": `bottom: 0%; right 0%; border-bottom: ${borderCommon}; border-right: ${borderCommon}; padding: 0 60px 60px 0`,
+      "1,2": `top: 0%; right: 0%; border-top: ${borderCommon}; border-right: ${borderCommon}; padding: 60px 60px 0 0`,
+      "2,1": `bottom: 0%; left: 0%; border-bottom: ${borderCommon}; border-left: ${borderCommon}; padding: 0 0 60px 60px`,
+      "2,2": `top: 0%; left: 0%; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 60px 0px 0px 60px`,
     };
     return quadStyleMap[quadrant.join()];
   }};
