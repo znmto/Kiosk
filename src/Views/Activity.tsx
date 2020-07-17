@@ -155,49 +155,6 @@ const Activity: React.FC<RouteComponentProps<MatchParams>> = memo(
             </Grid>
           </>
         )}
-        {/* <div
-          style={{
-            position: "absolute",
-            width: "100px",
-            left: "50%",
-            margin: "-50px 0px 0px -50px",
-            top: "50%",
-            display: "grid",
-          }}
-        >
-          <div
-            style={{
-              gridColumn: 1,
-              gridRow: 1,
-            }}
-          >
-            1
-          </div>
-          <div
-            style={{
-              gridColumn: 2,
-              gridRow: 1,
-            }}
-          >
-            2
-          </div>
-          <div
-            style={{
-              gridColumn: 1,
-              gridRow: 2,
-            }}
-          >
-            3
-          </div>
-          <div
-            style={{
-              gridColumn: 2,
-              gridRow: 2,
-            }}
-          >
-            4
-          </div>
-        </div> */}
         <Grid container justify="space-evenly">
           {media.map((m: Media, i: number) => (
             <Grid key={i} item xs={6} style={{ position: "relative" }}>

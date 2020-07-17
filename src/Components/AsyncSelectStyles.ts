@@ -17,17 +17,11 @@ export const StyledArrowDownwardIcon = styled(ArrowDownwardIcon)`
 
 export const StyledMediaSelectorWrapper = styled.div`
   display: grid;
-  /* grid-column: ${({ quadrant = [] }: StyleProps) => quadrant[0]};
-  grid-row: ${({ quadrant = [] }: StyleProps) => quadrant[1]}; */
-  grid-template-columns: 1fr 70% 1fr;
-  grid-template-rows: repeat(5, 1fr);
-  /* grid-template-rows: 7% 1fr 1fr 1fr 7%; */
   height: calc((100vh - 320px) / 2);
   align-content: center;
   justify-content: center;
   img.media-cover {
     grid-column: 2;
-    grid-row: 3;
     border-radius: 6px;
     height: 250px;
     margin: 0 auto;
@@ -85,14 +79,12 @@ export const StyledLoader = styled(LinearProgress)`
 export const StyledAsyncSelectWrapper = styled.div`
   width: 300px;
   grid-column: 2;
-  grid-row: 4;
   justify-self: center;
 `;
 export const StyledDescriptionContainer = styled.div`
   text-align: center;
   margin-top: 15px;
   grid-column: 2;
-  grid-row: 4;
   & a {
     text-decoration: none;
     color: unset;
@@ -102,10 +94,7 @@ export const StyledDescriptionContainer = styled.div`
 export const StyledActionIconsContainer = styled.div`
   display: grid;
   grid-column: 2;
-  grid-row: 2;
   justify-content: center;
-  align-self: end;
-  height: 50px;
   > div {
     margin: 0 10px;
   }

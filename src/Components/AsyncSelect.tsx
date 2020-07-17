@@ -287,7 +287,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             container
             direction="column"
             alignItems="center"
-            style={{ gridColumn: 2, gridRow: 3 }}
+            style={{ gridColumn: 2 }}
           >
             <Grid item>
               <Typography variant="h5">{`Search for a ${label} below`}</Typography>
@@ -323,10 +323,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
     };
 
     return (
-      <StyledMediaSelectorWrapper
-        quadrant={quadrant}
-        primary={theme.palette.primary.main}
-      >
+      <StyledMediaSelectorWrapper>
         {loading ? (
           <CircularProgress
             style={{
