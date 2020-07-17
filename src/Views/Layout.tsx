@@ -10,8 +10,7 @@ import {
 } from "@material-ui/core/styles";
 
 const StyledLayoutWrapper = styled.div`
-  margin-top: 100px;
-  margin-bottom: 55px;
+  margin-top: 130px;
 `;
 
 // https://paletton.com/#uid=3360u0kcvfm7JpEaLkAhQcem+9S

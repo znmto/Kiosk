@@ -17,7 +17,7 @@ export const StyledArrowDownwardIcon = styled(ArrowDownwardIcon)`
 
 export const StyledMediaSelectorWrapper = styled.div`
   display: grid;
-  height: calc((100vh - 320px) / 2);
+  height: calc((100vh - 250px) / 2);
   align-content: center;
   justify-content: center;
   img.media-cover {

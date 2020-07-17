@@ -26,7 +26,6 @@ type PublicUser = {
 
 const useStyles = makeStyles((theme: Theme) => ({
   shareableLinkContainer: {
-    padding: "30px 0",
     "& input": {
       width: "300px",
       padding: "5px",
