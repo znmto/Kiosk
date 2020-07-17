@@ -36,35 +36,46 @@ export const StyledMediaSelectorWrapper = styled.div`
 
 export const StyledIconWrapper = styled.div`
   & svg {
+    position: absolute;
     font-size: 32px;
   }
   color: ${(props: StyleProps) => props.primary};
-  display: grid;
-  /* padding: 30px; */
+  position: absolute;
+  text-align: center;
   ${({ quadrant = [] }: StyleProps): string => {
     const borderCommon = `1px solid #eee`;
     const quadStyleMap = {
-      "1,1": `align-items: center; justify-content: center; grid-row: 5; grid-column: 3; border-bottom: ${borderCommon}; border-right: ${borderCommon};`,
-      "1,2": `align-items: center; justify-content: center; grid-row: 1; grid-column: 3; border-top: ${borderCommon}; border-right: ${borderCommon};`,
-      "2,1": `align-items: center; justify-content: center; grid-row: 5; grid-column: 1; border-bottom: ${borderCommon}; border-left: ${borderCommon}; `,
-      "2,2": `align-items: center; justify-content: center; grid-row: 1; grid-column: 1; border-top: ${borderCommon}; border-left: ${borderCommon}; `,
+      "1,1": `bottom: 0%; right 0%; 
+        border-bottom: ${borderCommon};
+        border-right: ${borderCommon};
+        padding: 0 160px 160px 0;
+        svg {
+          transform: translate(75px, 90px);
+        }`,
+      "1,2": `top: 0%; right: 0%;
+        border-top: ${borderCommon}; 
+        border-right: ${borderCommon}; 
+        padding: 160px 160px 0 0;
+        svg {
+          transform: translate(75px, -110px);
+        }`,
+      "2,1": `bottom: 0%; left: 0%;
+        border-bottom: ${borderCommon}; 
+        border-left: ${borderCommon}; 
+        padding: 0 0 160px 160px;
+        svg {
+          transform: translate(-110px, 90px);
+        }`,
+      "2,2": `top: 0%; left: 0%;
+        border-top: ${borderCommon}; 
+        border-left: ${borderCommon}; 
+        padding: 160px 0px 0px 160px;
+        svg {
+          transform: translate(-110px, -110px);
+        }`,
     };
     return quadStyleMap[quadrant.join()];
   }};
-  /* ${({ quadrant = [] }: StyleProps): string => {
-    const borderCommon = `1px solid #eee`;
-    const quadStyleMap = {
-      "1,1": `justify-self: end;
-        align-self: end; border-bottom: ${borderCommon}; border-right: ${borderCommon}; padding: 120px 40px 40px 120px`,
-      "1,2": `justify-self: end;
-        align-self: start; border-top: ${borderCommon}; border-right: ${borderCommon}; padding: 40px 40px 120px 120px`,
-      "2,1": `justify-self: start;
-        align-self: end; border-bottom: ${borderCommon}; border-left: ${borderCommon}; padding: 120px 120px 40px 40px`,
-      "2,2": `justify-self: start;
-        align-self: start; border-top: ${borderCommon}; border-left: ${borderCommon}; padding: 40px 120px 120px 40px`,
-    };
-    return quadStyleMap[quadrant.join()];
-  }}; */
 `;
 
 export const StyledLoader = styled(LinearProgress)`
