@@ -32,5 +32,3 @@ Firestore expedites development by providing tooling for the database layer and 
 6. ~~Seed DB.~~
 7. Implement friends and feed functionality. (LT)
 8. Gather feedback.
-
-### Created using [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), and [Google Firebase](https://firebase.google.com/).
