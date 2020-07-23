@@ -69,7 +69,7 @@ const Matches: React.FC = (props) => {
   });
 
   useEffect(() => {
-    if (user?.uid && !isEmpty(selections.game)) {
+    if (user?.uid) {
       const getSetUsersThatHaveSelected = () => {
         Promise.all(
           media.map((k) => {
