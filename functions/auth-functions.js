@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const express = require("express");
 
 const app = express();
+require("dotenv").config();
 
 // resolve any uexpected CORS issues
 app.use(function (req, res, next) {

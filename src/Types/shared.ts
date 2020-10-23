@@ -85,4 +85,5 @@ export type Media = {
   externalUrlFormatter: (arg1: InterpolatableObject) => string;
   additionalRequest?: AdditionalRequest;
   ratingSource: RatingSource;
+  requestMetadata?: Record<string, unknown>;
 };

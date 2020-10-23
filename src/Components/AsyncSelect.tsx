@@ -59,6 +59,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       publicUserId,
       ratingSource,
       loading,
+      requestMetadata,
     } = props;
 
     const theme: Theme = useTheme();
@@ -212,6 +213,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             body: postData, // api POST body
             method, // api verb
             headers,
+            metadata: requestMetadata,
           },
         });
         // use individual custom schema parsing function to massage API response data

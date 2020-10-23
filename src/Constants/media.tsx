@@ -104,10 +104,10 @@ export const media: Media[] = [
     label: "Game",
     icon: <SportsEsports />,
     quadrant: [2, 2],
-    url: "https://api-v3.igdb.com/games",
+    url: "https://api.igdb.com/v4/games",
     method: "POST",
     headers: {
-      "user-key": process.env.REACT_APP_IGDB_USER_KEY || "",
+      // "user-key": process.env.REACT_APP_IGDB_USER_KEY || "",
       Accept: "application/json",
     },
     schemaParser: igdbSchemaParser,
@@ -121,10 +121,10 @@ export const media: Media[] = [
     additionalRequest: {
       description: "fetch cover art",
       matchFieldName: "cover",
-      url: "https://api-v3.igdb.com/covers",
+      url: "https://api.igdb.com/v4/covers",
       method: "POST",
       headers: {
-        "user-key": process.env.REACT_APP_IGDB_USER_KEY || "",
+        // "user-key": process.env.REACT_APP_IGDB_USER_KEY || "",
         Accept: "application/json",
       },
     },
@@ -134,6 +134,11 @@ export const media: Media[] = [
       icon: igdbLogo,
       name: "IGDB (Twitch)",
       normalized: true, // incoming rating is not /5
+    },
+    requestMetadata: {
+      tokenPreAuthUrl: process.env.REACT_APP_IGDB_TWITCH_OAUTH_URL,
+      clientId: process.env.REACT_APP_TWITCH_CLIENT_ID,
+      authService: "twitch",
     },
   },
 ];
