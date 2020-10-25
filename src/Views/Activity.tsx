@@ -76,7 +76,7 @@ const Activity: React.FC<RouteComponentProps<MatchParams>> = memo(
         const publicUser: PublicUser = data[0];
         return setPublicUser(publicUser);
       } catch (error) {
-        console.log("error", error.response);
+        console.log("getUserNamesById error", error);
       }
     };
 

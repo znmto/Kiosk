@@ -30,6 +30,12 @@ const omdbAdditionalRequest: AdditionalRequest = {
   },
 };
 
+const igdbRequestMetadata = {
+  tokenPreAuthUrl: process.env.REACT_APP_IGDB_TWITCH_OAUTH_URL,
+  clientId: process.env.REACT_APP_TWITCH_CLIENT_ID,
+  authService: "twitch",
+};
+
 export const media: Media[] = [
   {
     label: "Movie",
@@ -107,13 +113,12 @@ export const media: Media[] = [
     url: "https://api.igdb.com/v4/games",
     method: "POST",
     headers: {
-      // "user-key": process.env.REACT_APP_IGDB_USER_KEY || "",
       Accept: "application/json",
     },
     schemaParser: igdbSchemaParser,
     firestoreKey: GAME,
     dataFormatter: (interpolatable: string): string => {
-      // we need to format the input value  in a specific way for this api call
+      // we need to format the body in a specific way for this api call
       const prefix: string = "search ";
       const postfix: string = " fields *;";
       return `${prefix}"${interpolatable}";${postfix}`;
@@ -124,9 +129,9 @@ export const media: Media[] = [
       url: "https://api.igdb.com/v4/covers",
       method: "POST",
       headers: {
-        // "user-key": process.env.REACT_APP_IGDB_USER_KEY || "",
         Accept: "application/json",
       },
+      requestMetadata: igdbRequestMetadata,
     },
     externalUrlFormatter: (interpolatable: InterpolatableObject): string =>
       `${interpolatable?.value?.url}`,
@@ -135,10 +140,6 @@ export const media: Media[] = [
       name: "IGDB (Twitch)",
       normalized: true, // incoming rating is not /5
     },
-    requestMetadata: {
-      tokenPreAuthUrl: process.env.REACT_APP_IGDB_TWITCH_OAUTH_URL,
-      clientId: process.env.REACT_APP_TWITCH_CLIENT_ID,
-      authService: "twitch",
-    },
+    requestMetadata: igdbRequestMetadata,
   },
 ];

@@ -74,7 +74,6 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
 
     const updateMatchesInDb = async (optionCopy) => {
       try {
-        console.log("optionCopy", optionCopy);
         const mediaCollection = await firestore.collection("media");
         const matchFields = mediaCollection.doc(optionCopy?.id);
         const { user: { avatar = "", fullName = "" } = {} } = metadata;
@@ -168,7 +167,12 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
       customUrl: string;
     }) => {
       // just a simple extra call to our CORS Cloud Function to get additional data when needed
-      const { method, headers, description } = props.additionalRequest!;
+      const {
+        method,
+        headers,
+        description,
+        requestMetadata: requestMetadataForAdditonalRequest,
+      } = props.additionalRequest!;
       try {
         const { data: response } = await axios({
           url: FIREBASE_PROXY_URL,
@@ -182,6 +186,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             ...(!isEmpty(customBody) ? { body: customBody } : {}),
             method,
             headers,
+            metadata: requestMetadataForAdditonalRequest,
           },
         });
         return response;

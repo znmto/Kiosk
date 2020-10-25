@@ -16,15 +16,17 @@ const authServiceToClientSecretMap = authService =>
   }[authService]);
 
 const getToken = async ({ authService, url, clientId }) => {
-  console.log("clientId", clientId);
-  const { access_token: accessToken, expires_in: expiresIn } = await firestore
+  const persistedToken = await firestore
     .collection("access_tokens")
     .doc(authService)
     .get()
     .then(doc => doc && doc.data())
-    .catch(error => console.log("getToken error: ", error));
-  console.log("accessToken", accessToken);
-  if (expiresIn > 86400000) return accessToken;
+    .catch(error => console.log("getToken error", error));
+
+  if (persistedToken) {
+    const { access_token: accessToken, expires_in: expiresIn } = persistedToken;
+    if (accessToken && expiresIn > 86400000) return accessToken; // 1 day to be safe
+  }
 
   const newToken = await axios({
     url,
@@ -37,18 +39,14 @@ const getToken = async ({ authService, url, clientId }) => {
     },
     data: {},
   })
-    .then(({ data: response }) => {
-      console.log("response", response);
-      return response;
-    })
+    .then(({ data: response }) => response)
     .catch(error => console.log("newToken error", error));
-  // set in FB
-  console.log("newToken", newToken);
+  // set in DB
   await firestore.collection("access_tokens").doc(authService).set(newToken);
-
-  return newToken;
   // return new token
+  return newToken;
 };
+
 exports.cors = functions.https.onRequest((req, res) => {
   return cors(req, res, async () => {
     const {
@@ -67,8 +65,6 @@ exports.cors = functions.https.onRequest((req, res) => {
       augmentedHeaders.Authorization = `Bearer ${token.access_token}`;
       augmentedHeaders["Client-ID"] = metadata.clientId;
     }
-    console.log("augmentedHeaders", augmentedHeaders);
-    console.log("url, method, data", url, method, data);
     axios({
       url,
       method,
@@ -81,6 +77,6 @@ exports.cors = functions.https.onRequest((req, res) => {
       .then(({ status, data: response }) => {
         if (status === 200) res.status(200).send(response);
       })
-      .catch(error => console.log("error", error.response.status, error.response.statusText, error.response.data));
+      .catch(error => console.log("cors error", error));
   });
 });

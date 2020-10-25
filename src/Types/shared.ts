@@ -28,6 +28,7 @@ export type AdditionalRequest = {
   method: string;
   headers: Headers;
   data?: any;
+  requestMetadata?: Record<string, unknown>;
 };
 
 export type MatchesParams = {
