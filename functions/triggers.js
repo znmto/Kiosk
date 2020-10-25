@@ -11,7 +11,7 @@ exports.authOnCreate = functions.auth.user().onCreate(async user => {
     .set({
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       metadata: {
-        avatar: `https://api.adorable.io/avatars/75/${user.uid}.png`,
+        avatar: `https://us-central1-adorable-avatars-d3c4c.cloudfunctions.net/avatars/75/${user.uid}.png`,
         email: user.email,
         displayName: user.displayName,
       },

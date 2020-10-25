@@ -1,5 +1,5 @@
 import "isomorphic-fetch";
-import { BOOK, GAME, MOVIE, TV_SHOW } from "../Constants/media";
+import { GAME, MOVIE, TV_SHOW } from "../Constants/media";
 import { Grid, Grow, Link, Typography } from "@material-ui/core";
 import React, { ReactElement, memo, useContext } from "react";
 import { SelectionContext, useSession } from "../Helpers/CustomHooks";
@@ -27,7 +27,6 @@ import {
   StyledAsyncSelectWrapper,
   StyledDescriptionContainer,
   StyledActionIconsContainer,
-  StlyedActionIcon,
   StyledTrashIconContainer,
   StyledExternalLinkIconContainer,
   StyledSubtitle,
@@ -256,7 +255,7 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
             <StyledSubtitle paragraph variant="body1" display="inline">
               ({subtitle})
             </StyledSubtitle>
-            {rating && (
+            {rating ? (
               <>
                 <Grid container direction="column">
                   <Grid item>
@@ -284,6 +283,8 @@ const AsyncSelectProps: React.FC<AsyncSelectProps> = memo(
                   </Grid>
                 </Grid>
               </>
+            ) : (
+              <>/</>
             )}
           </StyledDescriptionContainer>
         );

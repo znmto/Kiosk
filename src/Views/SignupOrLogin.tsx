@@ -1,5 +1,5 @@
 // incorporates code from https://github.com/the-road-to-react-with-firebase/react-firestore-authentication
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import {
   Button,

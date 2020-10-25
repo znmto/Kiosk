@@ -2,12 +2,7 @@ import React from "react";
 import BottomNavigation from "../Components/BottomNavigation";
 import TopNavigation from "../Components/TopNavigation";
 import styled from "styled-components";
-import {
-  createMuiTheme,
-  Theme as AugmentedTheme,
-  ThemeProvider,
-  Theme,
-} from "@material-ui/core/styles";
+import { createMuiTheme, ThemeProvider, Theme } from "@material-ui/core/styles";
 
 const StyledLayoutWrapper = styled.div`
   margin-top: 130px;

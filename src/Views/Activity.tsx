@@ -17,7 +17,6 @@ import { Share } from "@material-ui/icons";
 import { Media } from "../Types/shared";
 import firebase from "../FirebaseConfig";
 import isEmpty from "lodash/isEmpty";
-import CircularProgress from "@material-ui/core/CircularProgress";
 
 type PublicUser = {
   email: string;
@@ -54,7 +53,6 @@ const Activity: React.FC<RouteComponentProps<MatchParams>> = memo(
     const classes = useStyles();
     const history = useHistory();
     const {
-      selections = {},
       setSelection,
       metadata = {},
       setMetadata,
