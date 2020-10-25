@@ -21,14 +21,3 @@ React Context is used to persist user and selection data across components. The 
 Using a Cloud Function as a gateway allows us to bypass CORS issues and listen for DB changes with hooks provided by Firebase such as `authOnCreate` or `authOnDelete`. It also provides a layer to handle some of the authentication logic.
 
 Firestore expedites development by providing tooling for the database layer and deep integration with client-side JavaScript frameworks.
-
-### `To Do`
-
-1. ~~Refactor hacky code.~~
-2. ~~Implement shareable link for unauthenticated activity sharing.~~
-3. ~~Add Types where missing/broken.~~
-4. ~~Finish UI/UX.~~
-5. ~~Local development walkthrough.~~
-6. ~~Seed DB.~~
-7. Implement friends and feed functionality. (LT)
-8. Gather feedback.
